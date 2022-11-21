@@ -1,0 +1,8 @@
+## Interface: 100002
+## Title: personnalModule
+## Author: Fixer
+## Version: 1.0
+## SavedVariablesPerCharacter: customMoney
+
+money.lua
+exchange.lua
