@@ -1,0 +1,8 @@
+## Interface: 100002
+## Title: walletTool
+## Author: Fixer
+## Version: 1.0
+## SavedVariablesPerCharacter: customMoney
+
+money.lua
+exchange.lua
