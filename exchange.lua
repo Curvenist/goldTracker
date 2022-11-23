@@ -72,24 +72,28 @@ function Exchange:loginEvent()
     f:SetScript("OnEvent", function()
         self.currentMoney = self:GetMoney()
         
-        self:catchup()
+        
         if customMoney[self.date] ~= nil then --loading existing data!
             self.dailyMoney = customMoney[self.date].dailyMoney
             self.income = customMoney[self.date].income
             self.spending = customMoney[self.date].spending
             self.dailyCatch = customMoney[self.date].dailyCatch
-            if self.netValue == nil then self.netValue = customMoney[self.date].netValue end
+            self.netValue = customMoney[self.date].netValue
             self.netValueD = customMoney[self.date].netValueD
+            self:catchup()
         else --a new day
             self.dailyMoney = self:GetMoney()
             self.income = 0
             self.spending = 0
+            self.netValue = 0
+            self.netValueD = 0
             self.dailyCatch = false
         end
         if not self.dailyCatch then
             self:catchupDaily() -- for setting netValueD
             self.dailyCatch = true
         end
+        
         
     end)
 end
