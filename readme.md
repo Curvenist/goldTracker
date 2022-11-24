@@ -13,19 +13,27 @@ Exposes a function that allows player to play music with a given playlist
 Exposes a function that records data and chart of money income and spending
 
 1) The file starts from the ealiest hour the player has connected in the day, we use it at starter
-    
-    It always record the money i have, then each time i get income / spending, 
-    I record then the sum of earnings and the sum of the spendings assides to generate the income data.
 
-    The last value of the day recorded is the final data needed to freeze the true income
+    properties explained Exchange.lua
+    eg :
 
-    eg : 
+        ■ date = recording date of the day
+        ■ dailyMoney = money at the first connection
+        ■ currentMoney = the current money the player has, whenever he is connected
+        ■ income = the income of gold for the player
+        ■ spending = the amount of gold spending
+        ■ netDailyValue = if the daily money doesn't add up with the last day the ■ player connected, we catch up a net value (< 0 is loss, > 0 is income)
+        ■ netValue = same but catching up with the same day, if the current value when player connects is different than what has been saved.
+        dailyCatch = we have collected the netDailyValue (can be upgraded to netDailyValue where the value can be set to nil or has a value in)
 
-        thu 151122 0950 = 10000 (Xog)
-        current = PLAYER_MONEY => getMoney()
+    functions in banking system
+    eg :
 
-        gold, quantityChange will be taken
-        
-        spending / earning
-        income if CURRENCY_DISPLAY_UPDATE >= 0
-        spending if CURRENCY_DISPLAY_UPDATE < 0
+        ■ DailyEvolution => from day to day
+        ■ WeekRecap => (Highest / lowest day perf)
+        ■ WeekEvolution => (Week performance / comparison to weeks)
+        ■ ?MonthRecap => (Highest / lowest day perf => same with week) => *
+        ■ ?Month Evolution => (Month performance / comparison to months and weeks) => data can be kept up to 2 months, if need be, we can collect to more*
+
+        =>* solution, gather information and compact it so may just have 1 entry (collecting global income and spending, netValue too)
+
