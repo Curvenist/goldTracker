@@ -37,3 +37,30 @@ Exposes a function that records data and chart of money income and spending
 
         =>* solution, gather information and compact it so may just have 1 entry (collecting global income and spending, netValue too)
 
+## Stash code
+
+
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+    <TileSize>
+        <AbsValue val="16" />
+    </TileSize>
+    <EdgeSize>
+        <AbsValue val="16" />
+    </EdgeSize>
+    <BackgroundInsets>
+        <AbsInset left="4" right="3" top="4" bottom="3" />
+    </BackgroundInsets>
+    </Backdrop>
+
+        <Button name="$parent_Button">
+            <Size>
+                <AbsDimension x="15" y="15" />
+            </Size>
+            <Anchor point="CENTER"></Anchor>
+            <NormalTexture file="Interface\Minimap\Tracking\OBJECTICONS">
+                <TexCoords left="0" right="0.125" top="0" bottom="0.5">
+            </NormalTexture>
+            <HighlightTexture>
+                <TexCoords left="0.125" right="0.125" top="0" bottom="0.5">
+            </HighlightTexture>
+        </Button>

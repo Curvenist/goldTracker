@@ -4,6 +4,9 @@
 ## Version: 1.0
 ## SavedVariablesPerCharacter: customMoney
 
-globalMethods.lua
-money.lua
-exchange.lua
+core/globalMethods.lua
+core/money.lua
+core/exchange.lua
+core/menu.lua
+core/ordering.lua
+
