@@ -7,31 +7,36 @@ Menu = {
 function Menu:main()
     local f = CreateFrame("Frame")
     f:RegisterEvent("ADDON_LOADED")
-
     f:SetScript("OnEvent", function(___, event, addonname)
-        
         if addonname == "walletTool" then
-            print(addonname);
-            if customMoney["Options"] ~= nil then
-                self.optVal = customMoney["Options"] -- in case of options checked
-            end
-            self:intializeData()
+            self.panel = CreateFrame("Frame")
+            self.panel.name = "BankOfSilvermoon"
+            self:intializeStructure()
         end
     end)
+    
 
 end
 
-function Menu:intializeData()
-    self.panel = CreateFrame("Frame")
-    self.panel.name = "Bank of Silvermoon"
+function Menu:intializeStructure()
+    -- current issue with Exchange, we need to retrieve the specific instance we
+    -- set up to make the code works
     local x, y = 0, -20
+    -- on voit les données mais il faut un système pour que la donnée soit chargée dynamiquement, cad il faut que income & co
+    -- soit chargé avec les données de l'Exchange en temps réel, et non de façon figée
+    local frame = self.panel
+    frame.fontStrings = {}
+    for k, v in pairs(Const) do
+        local linetext = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        linetext:SetPoint("TOPLEFT", x, y)
+        linetext:SetText(v)
+        frame.fontStrings[k .. "Text"] = linetext
+        local linevalue = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        linevalue:SetPoint("TOPLEFT", x + 300, y)
+        frame.fontStrings[k] = linevalue
+        y = y - 20
+    end
 
-    local line = CreateFrame("Frame", nil, self.panel)
-    line:SetPoint("TOPLEFT", x, y)
-    line:SetText("test")
-
-
-
-    InterfaceOptions_AddCategory(self.panel)
+	InterfaceOptions_AddCategory(frame)
 end
 
