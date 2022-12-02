@@ -1,7 +1,7 @@
-dateExchange = date("%d%m%Y")
+ExchangeDate = date("%d%m%Y")
 
 Exchange = {
-    date = dateExchange,
+    date = ExchangeDate,
     dailyMoney = 0, -- money at the first connection
     currentMoney = 0, -- the current money we have
     income = 0, -- plain income
@@ -28,14 +28,14 @@ end
 
 
 
--- we will check the last dateExchange when the player was connected
-function Exchange:checkLastCoDate(dateExchange)
-    local d = GlobalMethods:timeChecker(dateExchange)
+-- we will check the last ExchangeDate when the player was connected
+function Exchange:checkLastCoDate(ExchangeDate)
+    local d = GlobalMethods:timeChecker(ExchangeDate)
     local originDiff, comparedDiff = nil, nil
     for k,v in pairs(customMoney) do
-        if originDiff == nil and k ~= dateExchange then
+        if originDiff == nil and k ~= ExchangeDate then
             originDiff = {k, math.floor((d - GlobalMethods:timeChecker(k)) / (24 * 60 * 60))} -- seconds, math gives whole day
-        elseif comparedDiff == nil and k ~= dateExchange then
+        elseif comparedDiff == nil and k ~= ExchangeDate then
             comparedDiff = {k, math.floor((d - GlobalMethods:timeChecker(k)) / (24 * 60 * 60))} -- seconds, math gives whole day
         end
         if originDiff ~= nil and comparedDiff ~= nil then
@@ -46,31 +46,31 @@ function Exchange:checkLastCoDate(dateExchange)
         end
     end
     if originDiff == nil then 
-        return dateExchange
+        return ExchangeDate
      end
     return originDiff[1]
 end
 
 -- this function usage allows us to find if there is a difference between last currentMoney recorder with the dailyMoney one, if there is, then we update the nature of income or spending (this one will be catch on netIncome)
 function Exchange:catchupDaily()
-    local lastDate = self:checkLastCoDate(dateExchange)
-    if dateExchange ~= lastDate and customMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netDailyValue! made also sure that it's diff day
+    local lastDate = self:checkLastCoDate(ExchangeDate)
+    if ExchangeDate ~= lastDate and customMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netDailyValue! made also sure that it's diff day
         self.netValueD = self.dailyMoney - customMoney[lastDate].currentMoney
     end
 
 end
 
 function Exchange:catchup()
-    if self.currentMoney ~= customMoney[dateExchange].currentMoney then
-        self.netValue = self.netValue + self.currentMoney - customMoney[dateExchange].currentMoney
+    if self.currentMoney ~= customMoney[ExchangeDate].currentMoney then
+        self.netValue = self.netValue + self.currentMoney - customMoney[ExchangeDate].currentMoney
     end
 end
 
 function Exchange:main() -- fonction d'entrée, login started
     if customMoney == nil then -- fresh install
         customMoney = {}
-    elseif customMoney[dateExchange] == nil then
-        customMoney[dateExchange] = Exchange
+    elseif customMoney[ExchangeDate] == nil then
+        customMoney[ExchangeDate] = Exchange
     end
     self:frameAdvisor()
 end
@@ -87,13 +87,13 @@ function Exchange:loginEvent()
     f:RegisterEvent("PLAYER_LOGIN")
     f:SetScript("OnEvent", function()
         self.currentMoney = self:GetMoney()
-        if customMoney[dateExchange] ~= nil then --loading existing data!
-            self.dailyMoney = customMoney[dateExchange].dailyMoney
-            self.income = customMoney[dateExchange].income
-            self.spending = customMoney[dateExchange].spending
-            self.dailyCatch = customMoney[dateExchange].dailyCatch
-            self.netValue = customMoney[dateExchange].netValue
-            self.netValueD = customMoney[dateExchange].netValueD
+        if customMoney[ExchangeDate] ~= nil then --loading existing data!
+            self.dailyMoney = customMoney[ExchangeDate].dailyMoney
+            self.income = customMoney[ExchangeDate].income
+            self.spending = customMoney[ExchangeDate].spending
+            self.dailyCatch = customMoney[ExchangeDate].dailyCatch
+            self.netValue = customMoney[ExchangeDate].netValue
+            self.netValueD = customMoney[ExchangeDate].netValueD
             self:catchup()
         else --a new day
             self.dailyMoney = self:GetMoney()
@@ -130,7 +130,7 @@ function Exchange:logoutEvent()
     local f = CreateFrame("Frame")
     f:RegisterEvent("PLAYER_LOGOUT")
     f:SetScript("OnEvent", function()
-        customMoney[dateExchange] = Exchange
+        customMoney[ExchangeDate] = Exchange
     end)
    
 end
