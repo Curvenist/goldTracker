@@ -21,6 +21,16 @@ function Money:GetCopper()
     return self:GetMoney() % 100
 end
 
+function Money:ConvertGold(money)
+    return floor(money / 1e4)
+end
+function Money:ConvertSilver(money)
+    return floor(money / 100 % 100)
+end
+function Money:ConvertCopper(money)
+    return money % 100
+end
+
 return Money
 
 

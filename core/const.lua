@@ -1,11 +1,13 @@
 -- Exchange
-
 Const = {
-    date = "Date",
-    dailyMoney = "Crédit jour",
-    currentMoney = "Crédit courant",
-    income = "Gains",
-    spending = "Pertes",
-    netDailyValue = "Solde hors act. / jour",
-    netValue = "Solde hors act. auj."
+        Exchange = {
+                {"date", "Date"},
+                {"dailyMoney", "Crédit jour"},
+                {"currentMoney", "Crédit courant"},
+				{"netDailyCredi", "Résultat net"},
+                {"income", "Recette"},
+                {"spending", "Dépenses"},
+                {"netDailyValue", "Solde hors act. / jour"},
+                {"netValue", "Solde hors act. auj."}
+		}
 }

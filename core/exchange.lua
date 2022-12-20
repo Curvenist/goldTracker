@@ -4,6 +4,7 @@ Exchange = {
     date = ExchangeDate,
     dailyMoney = 0, -- money at the first connection
     currentMoney = 0, -- the current money we have
+	netEarning = 0, -- the current earning
     income = 0, -- plain income
     spending = 0, -- plain spending
     -- net value is recorded gain or loss when the player was not connected, see @Exchange:dailyCatch()
@@ -15,15 +16,18 @@ Exchange = {
 -- we will record here all the data in the ui to check our fluctuations (called function)
 --OHH YES 18:27 lundi 28 : WE FOUND THE SOLUTION TO TRACK THE ELEMENTS!
 function Exchange:popUpData()
+	self.netEarning = self.income + self.netDailyValue + self.netValue - self.spending
     if Menu.panel.fontStrings then
         Menu.panel.fontStrings["date"]:SetText(self.date)
-        Menu.panel.fontStrings["dailyMoney"]:SetText(self.dailyMoney)
-        Menu.panel.fontStrings["currentMoney"]:SetText(self.currentMoney)
-        Menu.panel.fontStrings["income"]:SetText(self.income)
-        Menu.panel.fontStrings["spending"]:SetText(self.spending)
-        Menu.panel.fontStrings["netDailyValue"]:SetText(self.netDailyValue)
-        Menu.panel.fontStrings["netValue"]:SetText(self.netValue)
+        Menu.panel.fontStrings["dailyMoney"]:SetText(Money:ConvertGold(self.dailyMoney))
+        Menu.panel.fontStrings["currentMoney"]:SetText(Money:ConvertGold(self.currentMoney))
+        Menu.panel.fontStrings["netEarning"]:SetText(Money:ConvertGold(self.netEarning))
+		Menu.panel.fontStrings["income"]:SetText(Money:ConvertGold(self.income))
+        Menu.panel.fontStrings["spending"]:SetText(Money:ConvertGold(self.spending))
+        Menu.panel.fontStrings["netDailyValue"]:SetText(Money:ConvertGold(self.netDailyValue))
+        Menu.panel.fontStrings["netValue"]:SetText(Money:ConvertGold(self.netValue))
     end
+	self.netEarning = 0
 end
 
 
@@ -150,7 +154,6 @@ function Exchange:updateCurrencyCollector(amount)
     else
         return false -- no changes
     end
-    
     return true
 end
 
