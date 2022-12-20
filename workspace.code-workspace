@@ -2,6 +2,12 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../musicTool"
+		},
+		{
+			"path": "../../WA_Codes"
 		}
 	],
 	"settings": {

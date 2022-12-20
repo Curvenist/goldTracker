@@ -10,7 +10,7 @@ function Menu:main()
     f:SetScript("OnEvent", function(___, event, addonname)
         if addonname == "walletTool" then
             self.panel = CreateFrame("Frame")
-            self.panel.name = "BankOfSilvermoon"
+            self.panel.name = "Bank Account"
             self:intializeStructure()
         end
     end)
@@ -26,14 +26,17 @@ function Menu:intializeStructure()
     -- soit chargé avec les données de l'Exchange en temps réel, et non de façon figée
     local frame = self.panel
     frame.fontStrings = {}
-    for k, v in pairs(Const) do
+	-- Why Const["Exchange"] doesn't work?
+    for k, v in ipairs(Const.Exchange) do 
+		local key = Const.Exchange[k][1]
+		local value = Const.Exchange[k][2]
         local linetext = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
         linetext:SetPoint("TOPLEFT", x, y)
-        linetext:SetText(v)
-        frame.fontStrings[k .. "Text"] = linetext
+        linetext:SetText(value)
+        frame.fontStrings[key .. "Text"] = linetext
         local linevalue = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
         linevalue:SetPoint("TOPLEFT", x + 300, y)
-        frame.fontStrings[k] = linevalue
+        frame.fontStrings[key] = linevalue
         y = y - 20
     end
 
