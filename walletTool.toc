@@ -9,7 +9,7 @@ core/globalMethods.lua
 core/money.lua
 core/exchange.lua
 core/menu.lua
-core/dataManagemnet.lua
+core/dataManagement.lua
 core/stats.lua
 
 

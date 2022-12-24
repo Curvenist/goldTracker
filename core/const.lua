@@ -4,7 +4,7 @@ Const = {
                 {"date", "Date"},
                 {"dailyMoney", "Crédit jour"},
                 {"currentMoney", "Crédit courant"},
-				{"netDailyCredi", "Résultat net"},
+				{"netEarning", "Résultat net"},
                 {"income", "Recette"},
                 {"spending", "Dépenses"},
                 {"netDailyValue", "Solde hors act. / jour"},

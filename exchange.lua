@@ -34,17 +34,19 @@ function Exchange:checkLastCoDate(date)
 end
 
 -- this function usage allows us to find if there is a difference between last currentMoney recorder with the dailyMoney one, if there is, then we update the nature of income or spending (this one will be catch on netIncome)
+-- 24/12/2022 dang it, forgot to add income and spending to calculate netValueD
 function Exchange:catchupDaily()
     local lastDate = self:checkLastCoDate(self.date)
     if self.date ~= lastDate and customMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netDailyValue! made also sure that it's diff day
-        self.netValueD = self.dailyMoney - customMoney[lastDate].currentMoney
+        self.netValueD = self.dailyMoney - self.income + self.spending - customMoney[lastDate].currentMoney
     end
 
 end
 
+-- 24/12/2022 dang it, forgot to add income and spending to calculate netValue
 function Exchange:catchup()
     if self.currentMoney ~= customMoney[self.date].currentMoney then
-        self.netValue = self.netValue + self.currentMoney - customMoney[self.date].currentMoney
+        self.netValue = self.netValue + (self.currentMoney - self.income + self.spending - customMoney[self.date].currentMoney)
     end
 end
 
