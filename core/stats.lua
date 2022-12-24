@@ -29,41 +29,59 @@ function Stats:performance(income, spending, netvalue) -- a performance returns 
     return self.result
 end
 
+--[[
+	Values constuct must be an object and following an array of values
+	Values : {
+		"Positives" : {income},
+		"Negatives" : {spending},
+		"NetValues" : {netValues}
+	}
+
+]]--
+
 -- functions for basic calculating (number to number) 
 -- @each returns objects
 
-function Stats:rating(income, spending, netvalue) 
-    netvalue = netvalue or 0
-    spending = spending or 0
-    local calc = self:performance(income, spending, netvalue)
-    return result
-end
-
-function Stats:average(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:rating(Values) 
+    Values = Values or {}
 
     return result
 end
 
-function Stats:stdDerivation(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:performance(Values)
+    Values = Values or {}
+
+	return result
+end
+
+function Stats:average(Values)
+    Values = Values or {}
+    return result
+end
+
+function Stats:variance(Values)
+    Values = Values or {}
+
+	return result
+end
+
+function Stats:stdDeviation(Values)
+    Values = Values or {}
 
     return result
 end
 
 
-function Stats:minPerf(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+
+
+function Stats:minPerf(Values)
+    Values = Values or {}
 
     return result
 end
 
-function Stats:MaxPerf(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:MaxPerf(Values)
+    Values = Values or {}
 
 
     return result
@@ -71,34 +89,30 @@ end
 
 -- functions for advanded calculating (dataObj to dataObj)
 
-function Stats:ratingAdv(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:ratingAdv(Values)
+    Values = Values or {}
 
 
     return result
 end
 
-function Stats:averageAdv(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:averageAdv(Values)
+    Values = Values or {}
 
 
     return result
 end
 
-function Stats:stdDerivationAdv(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:stdDerivationAdv(Values)
+    Values = Values or {}
 
 
     return result
 end
 
 
-function Stats:minPerfAdv(income, spending, netvalue)
-    netvalue = netvalue or 0
-    spending = spending or 0
+function Stats:minPerfAdv(Values)
+    Values = Values or {}
 
 
     return result
