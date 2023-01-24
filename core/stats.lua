@@ -1,6 +1,9 @@
 Stats = {
-	calculation = 0, -- just a transport for variables
-	compareCalculation = {}
+	calculation = {}, -- just a transport for variables	
+	simpleCalc = 0,
+	rating = {
+		num = 0, denom = 0
+	}
 }
 function Stats:new(o)
 	o = o or {}
@@ -15,31 +18,71 @@ end
 -- Values are constructed as array of values, what's positive is an earning, what's negative is a spending
 -- ie Values = {5, 10, -7, -2, 4}
 
+-- REVIEWED JANUARY :
+-- Vals can be both negatives and positives, depends if we're calculating : result (both profits and losses), profits, losses
+-- vals = {5, 10, -5, ...} or {-10, -20, -30, ...} or {10, 20, 30, ...} etc...
+-- dayX, dayY, ... are arrays of values, concatenation of array vals
+-- Values format is = {dayX{Vals}, dayY(Vals), ...}
+-- Also = {Vals}
 
 
-function Stats:setCalculation(Value)
-	self.calculation = Value
+function Stats:setCalculation(Value, perfn)
+	self.calculation[perfn] = Value
 end
 
-function Stats:incrementCalculation(Value)
-	self.calculation = self.calculation + Value
+function Stats:incrementCalculation(Value, perfn)
+	self.calculation[perfn] = self.calculation[perfn] + Value
+end
+
+function Stats:makeCalculation(Value, operator, perfn)
+	return load("self.calculation[perfn] = self.calculation[perfn]" .. operator .. Value)()
 end
 
 function Stats:getCalculation()
 	return self.calculation
 end
 
-function Stats:setCompareCalculation(Value, perfn)
-	self.compareCalculation[perfn] = Value
+
+function Stats:setSimpleCalculation(Value)
+	self.calculation = Value
 end
 
-function Stats:incrementCompareCalculation(Value, perfn)
-	self.compareCalculation[perfn] = self.compareCalculation[perfn] + Value
+function Stats:incrementSimpleCalculation(Value)
+	self.simpleCalc = self.simpleCalc + Value
 end
 
-function Stats:getCompareCalculation()
-	return self.compareCalculation
+function Stats:getSimpleCalculation()
+	return self.simpleCalc
 end
+
+
+function Stats:setNum(Value)
+	self.rating.num = Value
+end
+
+function Stats:incrementNum(Value)
+	self.rating.num = self.rating.num + Value
+end
+
+function Stats:getNum()
+	return self.rating.num
+end
+
+
+function Stats:setDenom(Value)
+	self.rating.denom = Value
+end
+
+function Stats:incrementDenom(Value)
+	self.rating.denom = self.rating.denom + Value
+end
+
+function Stats:getDenom()
+	return self.rating.denom
+end
+
+
+-- end of incremental result calculation
 
 function Stats:isPair(value)
 	if math.ceil(value / 2) ~= value / 2 then
@@ -48,31 +91,55 @@ function Stats:isPair(value)
 	return false
 end
 
-function Stats:performance(Values) -- a performance returns a variation between data
+
+function Stats:performance(Values) -- a performance returns a variation between data, check review in JANUARY*
     Values = Values or {}
-	self:setCalculation(0)
 	for k, v in pairs(Values) do
+		self:setCalculation(0, k)
 		if type(Values[k]) == "table" then
-			for ka, va in ipairs(Values[k]) do
-				self:incrementCalculation(va)
+			for ka, va in pairs(Values[k]) do
+				self:incrementCalculation(va, k)
 			end
 		else
-			self:incrementCalculation(v)
+			self:incrementCalculation(v, k)
 		end
 	end
-	return
+	return self:getCalculation()
+end
+
+-- unCluster = we regoup values in array, ie : {{10}, {15} ...} instead of arrays {{10, 11}, {25, 30, 25} ...}
+function Stats:performanceUncluster()
+	self:setSimpleCalculation(0)
+	for k, v in pairs(self:getCalculation()) do
+		for ka, va in pairs(self:getCalculation()[k]) do
+			self:incrementSimpleCalculation(v)
+		end	
+	end
+	self.setCalculation(self:getSimpleCalculation(), 1)
 end
 
 -- functions for basic calculating (number to number) 
 -- @each returns objects
 
-function Stats:rating(Values) 
+--[[
+Sample idea : benefit for n
+1  = 10
+n - 1  = 15
+n - 2 = 20
+
+we compare ((10 / 15) - 1) * 100
+]]--
+
+function Stats:rating(Values)
     Values = Values or {}
-	local rating = {
-		num = 0, denom = 0
-	}
+	self:resetStats()
+	
+	if #Values ~= 2 then -- must be an array of 2 arrays, no matter if we have an array or not inside, question about whats in the numerator and whats in the denominator
+		return 0
+	end
+
 	for k, v in pairs(Values) do
-		self:setCompareCalculation(0, k)
+		self:setCalculation(0, k) -- initialize table of values incremental array[valsn[], valsn-1[]] or just array[benefitn, benefitn-1]
 		if type(Values[k]) == "table" then
 			for ka, va in ipairs(Values[k]) do
 				self:incrementCalculation(va, k)
@@ -81,86 +148,63 @@ function Stats:rating(Values)
 			self:incrementCalculation(v, k)
 		end
 	end
-	local i = 1
-	for k, v in pairs(self:getCompareCalculation()) do
-		if self:isPair(i) then
-			rating.denom = rating.denom + self:getCompareCalculation()[k]
+
+	for k, v in pairs(self:getCalculation()) do
+		if k == 1 then
+			self:incrementDenom(self:getCalculation()[k])
 		else
-			rating.num = rating.num + self:getCompareCalculation()[k]
+			self:incrementNum(self:getCalculation()[k])
 		end
-		i = i + 1
 	end
-	return ((rating.num / rating.denom) - 1) * 100
+
+	return ((self:getNum() / self:getDenom()) - 1) * 100
 end
 
-function Stats:performance(Values)
-    Values = Values or {}
-
-	return result
-end
 
 function Stats:average(Values)
     Values = Values or {}
-    return result
+	self:resetStats()
+	self:performance(Values)
+
+    return self:performanceUncluster()[1] / #Values
 end
+
 
 function Stats:variance(Values)
     Values = Values or {}
+	self:resetStats()
+	self:performance(Values)
+	for k, v in pairs(self:getCalculation()) do
+		self:incrementSimpleCalculation((v - self:average(Values))^2) 
+	end
 
-	return result
+	return (self:getSimpleCalculation() / #Values)
 end
 
 function Stats:stdDeviation(Values)
     Values = Values or {}
+	self:resetStats()
 
-    return result
+    return self:variance(Values)^(1/2)
 end
 
 
-
-
-function Stats:minPerf(Values)
+function Stats:minMaxPerf(Values, isMin)
     Values = Values or {}
-
-    return result
-end
-
-function Stats:MaxPerf(Values)
-    Values = Values or {}
-
-
-    return result
-end
-
--- functions for advanded calculating (dataObj to dataObj)
-
-function Stats:ratingAdv(Values)
-    Values = Values or {}
-
-
-    return result
-end
-
-function Stats:averageAdv(Values)
-    Values = Values or {}
-
-
-    return result
-end
-
-function Stats:stdDerivationAdv(Values)
-    Values = Values or {}
-
-
-    return result
-end
-
-
-function Stats:minPerfAdv(Values)
-    Values = Values or {}
-
-
-    return result
+	self:performance(Values)
+	local checkVal, checkKey, i = 0, 0, 1
+	for k, v in pairs(Stats:getCalculation()) do
+		if i == 1 then
+			checkKey, checkVal = k, v
+		end
+		if isMin and v < checkVal then
+			checkKey, checkVal = k, v
+		elseif not isMin and v > checkVal then
+			checkKey, checkVal = k, v
+		end
+		i = i + 1
+	end
+    return {checkKey, checkVal}
 end
 
 function Stats:MaxPerfAdv(income, spending, netvalue)
@@ -168,4 +212,12 @@ function Stats:MaxPerfAdv(income, spending, netvalue)
     spending = spending or 0
 
     return result
+end
+
+function Stats:resetStats()
+	self.calculation = {}
+	self.simpleCalc = 0
+	self.rating = {
+		num = 0, denom = 0
+	}
 end
