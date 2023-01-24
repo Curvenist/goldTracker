@@ -4,6 +4,9 @@
 ## Version: 1.0
 ## SavedVariablesPerCharacter: customMoney
 
+libs/LibGraph-2.0/LibStub.lua
+libs/LibGraph-2.0/LibGraph-2.0/LibGraph-2.0.lua
+
 core/const.lua
 core/globalMethods.lua
 core/money.lua
