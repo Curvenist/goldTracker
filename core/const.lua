@@ -15,15 +15,9 @@ Const = {
 			{"Provisionning", "Budgétisation"}, -- bouton permettant de créer un budget de dépense à alluer (chiffre + temporel)
 			{"CibledAim", "Performance ciblée"} -- bouton permettant de créer un performance cible à réaliser (chiffre + temporel)
 		},
-        Exchange = {
-            {"date", "Date"},
-            {"dailyMoney", "Crédit jour"},
-            {"currentMoney", "Crédit courant"},
-			{"netEarning", "Résultat net"},
-            {"income", "Recette"},
-            {"spending", "Dépenses"},
-            {"netDailyValue", "Solde hors act. / jour"},
-            {"netValue", "Solde hors act. auj."}
+        Exchange = { 
+            {"currentMoney", "Liquidités"},
+			{"netEarning", "Flux"},
 		}
 }
 

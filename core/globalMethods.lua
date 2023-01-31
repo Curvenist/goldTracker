@@ -13,6 +13,22 @@ function GlobalMethods:timeChecker(sdate)
     })
 end
 
+function GlobalMethods:convertToDateType(date) -- must be a format DayMonthYear
+	if type(date) == "string" then
+	local pow = #date - 4
+	date = {
+		year = math.floor(date % 10^pow),
+		month = math.floor(date / 10^pow % 100),
+		day = math.floor(date / 1e6),
+		hour = 0,
+		min = 0,
+		sec = 0
+	}
+	return time(date)
+end
+return date
+end
+
 function GlobalMethods:tableContains(tab, val)
     for k, v in pairs(tab) do
         if v == val then 
