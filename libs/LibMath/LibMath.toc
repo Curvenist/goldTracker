@@ -1,0 +1,15 @@
+﻿## Interface: 100005
+## X-Max-Interface: 50400
+## X-Min-Interface: 30000
+## X-Compatible-With: 50400
+## Title: Lib: LibMath (r.7)
+## Version: v10.0.5
+## Notes: Extended math library for Lua
+## Author: Humbedooh
+## OptionalDeps: LibStub
+# core files
+## X-Curse-Packaged-Version: r7
+## X-Curse-Project-Name: LibMath
+## X-Curse-Project-ID: libmath
+## X-Curse-Repository-ID: wow/libmath/mainline
+LibMath.lua

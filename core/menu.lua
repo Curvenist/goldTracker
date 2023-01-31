@@ -10,7 +10,7 @@ function Menu:main()
     f:RegisterEvent("ADDON_LOADED")
     f:SetScript("OnEvent", function(___, event, addonname)
         if addonname == "walletTool" then
-			self:setupOverlay(addonname)
+			self:setupOverlay(addonname) --library
 
 			self.panel = self:setupFrame("Bank Account")
 			self.panel.texture = self:addTexture()
@@ -22,10 +22,10 @@ function Menu:main()
 
 			local t = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 			t:SetPoint("TOP", 0, 0)
-			t:SetText("X")
+			t:SetText("x")
 			f.fontString = t
 			
-			f:SetScript("OnClick", function () self.panel:Hide(); self.isShown = false end)
+			f:SetScript("OnClick", function () self.panel:Hide(); self.isShown = false; return end)
 
 			self.panel.buttonClose = f
 			
@@ -39,16 +39,16 @@ end
 
 function Menu:setupOverlay(addonname)
 	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject(addonname, {
-		type = "data source",		
 		text = addonname,		
-		icon = "Interface\\HELPFRAME\\HelpIcon-KnowledgeBase",	
+		icon = "Interface\\icons\\inv_misc_bag_01",	
 		OnClick = function(s, btn)	
 			if self.isShown then self.panel:Hide(); self.isShown = false
 			elseif not self.isShown then self.panel:Show() self.isShown = true end
+			return
 		end
 		})
 		local icon = LibStub("LibDBIcon-1.0", true)
-		icon:Register(addonname, miniButton, MyLittleAddonDB)
+		icon:Register(addonname, miniButton)
 end
 
 function Menu:setupFrame(name)
@@ -57,7 +57,13 @@ function Menu:setupFrame(name)
 
 	panel:SetFrameStrata("BACKGROUND")
 	panel:SetWidth("400")
-	panel:SetHeight("200")
+	panel:SetHeight("150")
+	panel:EnableKeyboard()
+	panel:SetPropagateKeyboardInput(true)
+	panel:SetScript("OnKeyDown", function (arg, key) 
+		if key == "ESCAPE" then
+			self.panel:Hide(); self.isShown = false;
+		end end)
 
 	panel:SetPoint("Center", 0, 0)
 
@@ -75,12 +81,8 @@ function Menu:intializeStructure()
     -- current issue with Exchange, we need to retrieve the specific instance we
     -- set up to make the code works
     local x, y = 0, -20
-    -- on voit les données mais il faut un système pour que la donnée soit chargée dynamiquement, cad il faut que income & co
-    -- soit chargé avec les données de l'Exchange en temps réel, et non de façon figée! 
-	-- UPDATE: il faut que les données de l'interface changent en temps réel
     local frame = self.panel
     frame.fontStrings = {}
-	-- Why Const["Exchange"] doesn't work?
     for k, v in ipairs(Const.Exchange) do 
 		local key = Const.Exchange[k][1]
 		local value = Const.Exchange[k][2]

@@ -1,11 +1,15 @@
-## Interface: 100002
+## Interface: 100005
 ## Title: walletTool
 ## Author: Fixer
 ## Version: 1.0
 ## SavedVariablesPerCharacter: customMoney
 
+libs/LibDBIcon-1.0/embeds.xml
+libs/LibDBIcon-1.0/LibDBIcon-1.0/lib.xml
+
 libs/LibGraph-2.0/LibStub.lua
 libs/LibGraph-2.0/LibGraph-2.0/LibGraph-2.0.lua
+
 
 core/const.lua
 core/globalMethods.lua
