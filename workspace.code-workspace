@@ -4,10 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "../musicTool"
+			"path": "../../WA_code"
 		},
 		{
-			"path": "../../WA_code"
+			"path": "../../../../../../../Apps/Steam/steamapps/common/JA_Mods/Source Code/SerenityJediEngine2020"
 		}
 	],
 	"settings": {

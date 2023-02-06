@@ -14,7 +14,7 @@ Exposes a function that records data and chart of money income and spending
 
 1) The file starts from the ealiest hour the player has connected in the day, we use it at starter
 
-    properties explained Exchange.lua
+    properties explained Tracker.lua
     eg :
 
         ■ date = recording date of the day
@@ -39,28 +39,125 @@ Exposes a function that records data and chart of money income and spending
 
 ## Stash code
 
+customMoney = {
+	[1673478000] = {
+		["dailyMoney"] = 15043508958,
+		["dailyCatch"] = true,
+		["netValue"] = 0,
+		["currentMoney"] = 15047463093,
+		["income"] = 19733557,
+		["netDailyValue"] = 0,
+		["netEarning"] = 0,
+		["spending"] = 15779422,
+		["netValueD"] = 0,
+		["date"] = "12012023",
+	},
+	[1673737200] = {
+		["dailyMoney"] = 13162758745,
+		["dailyCatch"] = true,
+		["netValue"] = 0,
+		["currentMoney"] = 13172008615,
+		["income"] = 9681475,
+		["spending"] = 431605,
+		["netDailyValue"] = 0,
+		["netEarning"] = 0,
+		["netValueD"] = 0,
+		["date"] = "15012023",
+	},
+	[1673996400] = {
+		["dailyMoney"] = 13177024733,
+		["dailyCatch"] = true,
+		["date"] = "18012023",
+		["netValueD"] = 0,
+		["income"] = 148210272,
+		["spending"] = 29257259,
+		["netDailyValue"] = 0,
+		["netEarning"] = 0,
+		["currentMoney"] = 13295977746,
+		["netValue"] = 0,
+	},
+	[1674255600] = {
+		["dailyMoney"] = 13300886788,
+		["dailyCatch"] = true,
+		["date"] = "21012023",
+		["netValueD"] = 0,
+		["income"] = 45414961,
+		["spending"] = 11831738,
+		["netDailyValue"] = 0,
+		["netEarning"] = 0,
+		["currentMoney"] = 13334470011,
+		["netValue"] = 0,
+	},
+	[1674514800] = {
+		["dailyMoney"] = 14537512955,
+		["dailyCatch"] = true,
+		["date"] = "24012023",
+		["netValueD"] = 0,
+		["income"] = 2214270,
+		["spending"] = 12321293,
+		["netDailyValue"] = 0,
+		["netEarning"] = 0,
+		["currentMoney"] = 14527405932,
+		["netValue"] = 0,
+	},
+	[1674774000] = {
+		["dailyMoney"] = 0,
+		["dailyCatch"] = false,
+		["date"] = "27012023",
+		["income"] = 0,
+		["netEarning"] = 0,
+		["netDailyValue"] = 0,
+		["netValue"] = 0,
+		["currentMoney"] = 0,
+		["spending"] = 0,
+	},
+}
+dateArray = {}
+for k, v in pairs(customMoney) do
+    table.insert(dateArray, k)
+end
+table.sort(dateArray, function(a, b) return a > b end)
 
-    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-    <TileSize>
-        <AbsValue val="16" />
-    </TileSize>
-    <EdgeSize>
-        <AbsValue val="16" />
-    </EdgeSize>
-    <BackgroundInsets>
-        <AbsInset left="4" right="3" top="4" bottom="3" />
-    </BackgroundInsets>
-    </Backdrop>
+for k, v in pairs(dateArray) do
+    print(v)
+end
 
-        <Button name="$parent_Button">
-            <Size>
-                <AbsDimension x="15" y="15" />
-            </Size>
-            <Anchor point="CENTER"></Anchor>
-            <NormalTexture file="Interface\Minimap\Tracking\OBJECTICONS">
-                <TexCoords left="0" right="0.125" top="0" bottom="0.5">
-            </NormalTexture>
-            <HighlightTexture>
-                <TexCoords left="0.125" right="0.125" top="0" bottom="0.5">
-            </HighlightTexture>
-        </Button>
+print("-----")
+
+function datePicker(datePicker, interval, vals) -- prendre un interval de date
+datePicker, interval, vals =  datePicker or {}, interval or {}, {}
+
+arrayOfDates = dateArray
+if #datePicker ~= 0 then
+    arrayOfDates = datePicker
+end
+
+for k, v in pairs(arrayOfDates) do
+    if #interval == 2 then
+    if v <= interval[2] and v >= interval[1] then
+        table.insert(vals, v)
+    end
+    else
+        table.insert(vals, v)
+    end
+end
+return vals
+end
+
+function dateMathPicker(daysOfWeek, occurences) -- intéressant pour capter des dates par comparaison - tous les mercredi*
+
+
+end
+
+
+calcul = datePicker({}, {1673478000, 1674774000})
+--calcul = datePicker({dateArray[2], dateArray[3], dateArray[4]})
+--calcul = dateMathPicker({2, 3}, 5) --Every Tuesday / wednesday for 5 weeks
+
+for k, v in pairs(calcul) do
+
+ print(os.date("%w",v))
+end
+
+
+

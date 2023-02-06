@@ -1,7 +1,7 @@
 --here are the code exec commands
 
 -- setting up the listeners / basic gathering functions
-Exchange:main()
-Menu:main()
+Tracker:main()
+MainM:main()
 
 -- setting up the interface to watch over data

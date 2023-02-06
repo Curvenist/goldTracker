@@ -1,4 +1,3 @@
--- Exchange
 Const = {
 		Langage = {
 			"2", "3"
@@ -6,18 +5,27 @@ Const = {
 		Labels = {
 			{"myBank", "Capital"}
 		},
-		MenuItems = {
-			{"DailyRecap", "Résumé du jour"}, -- afficher en plus : performance moyenne sur 7 jours, moyenne des gains sur 7 jours
-			{"WeeklyRecap", "Performance hebdomadaire"}, -- graph
-			{"MonthlyRecap", "Performance mensuelle"}, -- graph
-			{"ComparedPerformance", "Performances comparées"}, -- basé sur rating, peut fonctionner par fourchette
-			{"BookAccount", "Livre de compte"}, -- Afficher un tableau avec un sytème de dates, à la fin earnings / dépenses (mettre en vert les jours avec un excedent, en rouge, les jours déficits)
-			{"Provisionning", "Budgétisation"}, -- bouton permettant de créer un budget de dépense à alluer (chiffre + temporel)
-			{"CibledAim", "Performance ciblée"} -- bouton permettant de créer un performance cible à réaliser (chiffre + temporel)
+		CommonTranslations = {
+			{"Greet", "Bonjour %player, voici le récapitulatif de votre activité :"},
+			{"Performance", "Performance"},
 		},
-        Exchange = { 
+		-- From here, we have labelling data, works well with MenuM.displayTrackerElements, putting nothing in translation will result in having no translation
+		MenuItems = {
+			{"DailyRecap", "Résumé"}, -- afficher en plus : performance moyenne sur 7 jours, moyenne des gains sur 7 jours
+			{"Weekly", "Hebdomadaire"}, -- graph
+			{"Monthly", "Mensuelle"}, -- graph
+			{"Compared", "Comparée"}, -- basé sur rating, peut fonctionner par fourchette
+			{"BookAccount", "Livre de compte"}, -- Afficher un tableau avec un sytème de dates, à la fin earnings / dépenses (mettre en vert les jours avec un excedent, en rouge, les jours déficits)
+			{"Provisionning", "Budget"}, -- bouton permettant de créer un budget de dépense à alluer (chiffre + temporel)
+			{"Aim", "ciblée"} -- bouton permettant de créer un performance cible à réaliser (chiffre + temporel)
+		},
+        TrackerCurrent = { 
             {"currentMoney", "Liquidités"},
-			{"netEarning", "Flux"},
+			{"netEarning", "Performance"},
+		},
+		TrackerPast = {  -- we will rely on customMoney
+			{"date", ""}, -- no text
+			{"netEarning", ""} -- no text
 		}
 }
 
