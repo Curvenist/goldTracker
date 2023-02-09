@@ -18,9 +18,10 @@ core/global/generalM.lua
 core/interface/mainM.lua
 
 core/const.lua
-core/CMM.lua
 core/money.lua
 core/stats.lua
+core/CMM.lua
+core/trackerInstance.lua
 core/tracker.lua
 
 core/ordering.lua
