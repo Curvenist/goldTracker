@@ -24,8 +24,7 @@ Const = {
 			{"netEarning", "Performance"},
 		},
 		TrackerPast = {  -- we will rely on customMoney
-			{"date", ""}, -- no text
-			{"netEarning", ""} -- no text
+			{"values", nil} -- no text
 		}
 }
 

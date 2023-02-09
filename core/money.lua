@@ -4,7 +4,7 @@ Money = {
     Money = nil,
 	Trencher = {
 		"k", "m", "M"
-	}
+	},
 }
 
 function Money:GetMoney()
@@ -15,6 +15,7 @@ function Money:SetMoney(money)
 end
 
 function Money:logarithm(value, base)
+	value = math.abs(value)
 	if base then
 		return math.log(value) / math.log(base)
 	end
@@ -22,21 +23,22 @@ function Money:logarithm(value, base)
 end
 
 function Money:TruncatedRigth(value, number)
-	if value < 0 then
-		value = value * -1
-	end
-	return math.floor((value % 1) * 10^number)
+	return math.floor((math.abs(value) % 1) * 10^number)
 end
 
-function Money:convertGreatVals(money, firstbase, base)
-	firstbase = firstbase or 4
+function Money:Truncated(value, number)
+	return math.floor(value) + (math.floor((math.abs(value) % 1) * 10^number) / 10^number)
+end
+
+function Money:convertGreatVals(money, firstbase, base, decimal)
+	firstbase, decimal = firstbase or 4, decimal or 2
 	base = base or #Money.Trencher
 	if money ~= 0 then
 		money = money / 10^firstbase
 		local logarithm = math.floor(Money:logarithm(money, 10))
 		local modulo = logarithm % base
 		local sep = logarithm - modulo
-    	return math.floor(money / 10^sep) .. "." .. Money:separator(money, base) .. Money:TruncatedRigth(money / 10^sep, 3)
+    	return math.floor(money / 10^sep) .. Money:separator(money, base) .. Money:TruncatedRigth(money / 10^decimal, 3)
 	end
 	return money
 end
@@ -55,6 +57,20 @@ function Money:separator(money, base)
         end
     end
     return separator
+end
+
+-- value must be a number! this method is an order of comparison
+function Money:dataInterpretation(value, limit, opt)
+	if type(value) ~= "number" then return value end
+	opt[3], limit[3] = opt[3] or 1, limit[3] or limit[1]
+	if opt[3] ~= 1 and opt[3] ~= 2 then
+		return value
+	end
+
+	if GeneralM:case(value > limit[1], function () end) then return opt[1] 
+	elseif GeneralM:case(value < limit[2], function () end) then return opt[2]
+	elseif GeneralM:case(value == limit[3], function () end) then return opt[opt[3]]
+	else return value end
 end
 
 function Money:GetGold()

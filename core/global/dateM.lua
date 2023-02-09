@@ -6,9 +6,7 @@ function DateM:timeChecker(sdate)
     local p = "(%d%d)(%d%d)(%d+)"
     local d, m, y = sdate:match(p)
     return time({
-        year = y,
-        month = m,
-        day = d
+        year = y, month = m, day = d
     })
 end
 
@@ -19,9 +17,7 @@ function DateM:convertToDateType(date) -- must be a format DayMonthYear
 		year = math.floor(date % 10^pow),
 		month = math.floor(date / 10^pow % 100),
 		day = math.floor(date / 1e6),
-		hour = 0,
-		min = 0,
-		sec = 0
+		hour = 0, min = 0, sec = 0
 	}
 	return time(date)
 end
@@ -69,12 +65,39 @@ function DateM:datePicker(datePicker, interval, array, vals) -- prendre un inter
 	if #datePicker ~= 0 then
 		arrayOfDates = datePicker
 	end
-	for k, v in pairs(arrayOfDates) do
-		if #interval == 2 then
-		if v <= interval[2] and v >= interval[1] then
+	if #interval == 2 then
+		for k, v in pairs(arrayOfDates) do
 			table.insert(vals, v)
 		end
-		else
+	else
+		for k, v in pairs(arrayOfDates) do
+			if v <= interval[2] and v >= interval[1] then
+				table.insert(vals, v)
+			end
+		end
+	end
+	return vals
+end
+
+
+-- interval[1] is timestamp
+-- interval[2] is the step vector
+function DateM:dateTranslationPicker(interval, array, vals)
+	interval, array, vals = interval or {}, array or self.dateItems, {}
+	local arrayOfDates = array
+	if #interval ~= 2 then
+		for k, v in pairs(arrayOfDates) do
+			table.insert(vals, v)
+		end
+	else
+		for k, v in pairs(arrayOfDates) do
+			if v == interval[1] then
+				vals = {}
+				for l = k, 	k + interval[2], interval[2]/math.abs(interval[2]) do
+					table.insert(vals, arrayOfDates[l])
+				end
+				break
+			end
 			table.insert(vals, v)
 		end
 	end
@@ -116,4 +139,27 @@ function DateM:dateMathPicker(daysOfWeek, occurences, array, vals)
         end
     end
     return vals
+end
+
+-- we will check the last TrackerDate when the player was connected
+function DateM:checkLastCoDate(TrackerDate)
+    local dateTimestamp = DateM:convertToDateType(TrackerDate)
+    local originDiff, comparedDiff = nil, nil
+    for k,v in pairs(customMoney) do
+        if originDiff == nil and k ~= TrackerDate then
+            originDiff = {k, math.floor((dateTimestamp - DateM:convertToDateType(k)))} -- seconds, math gives whole day
+        elseif comparedDiff == nil and k ~= TrackerDate then
+            comparedDiff = {k, math.floor((dateTimestamp - DateM:convertToDateType(k)))} -- seconds, math gives whole day
+        end
+        if originDiff ~= nil and comparedDiff ~= nil then
+            if originDiff[2] > comparedDiff[2] then
+             originDiff = comparedDiff
+             end
+             comparedDiff = nil --always clear the compare one 
+        end
+    end
+    if originDiff == nil then 
+        return TrackerDate
+     end
+    return originDiff[1]
 end

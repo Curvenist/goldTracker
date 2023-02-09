@@ -4,11 +4,24 @@ MainM = {
     panel = nil,
 	isShown = false,
 
-	parameters = {
+	p = {
 		w = 400,
 		h = 150
+	},
+	c = {
+		bSizX = 400 / 2,
+		bSizY = 150 / 1.5,
+		bPosY = (150 / 2) * (-1)
 	}
 }
+
+function MainM:getHeight(Height)
+	return self.p.h
+end
+
+function MainM:getWidth(Width)
+	return self.p.w
+end
 
 function MainM:main()
     local f = CreateFrame("Frame")
@@ -24,14 +37,11 @@ function MainM:main()
 			self.panel.buttonClose = self:appendCloseBox()
 
 			local X, Y = {0, 0, 100}, {0, -20, 0}
-			self.panel.central = self:addPanelElementItem("central", Const.TrackerCurrent, {"LEFT", 200, 100, X, Y}, "Frame")
-			Y = {0, 0, 0}
-			for i = 1, 3 do 
-				self.panel["side" .. i] = self:addPanelElementItem("side" .. i, Const.TrackerPast, {"LEFT", 200, 100, {200, 100, 100}, Y}, "Frame")
-				Y[1] = Y[1] - 20
-			end
-			self.panel.arrowLeft = self:addPanelElementMethod("arrowLeft", self:buttonCall(false), {"LEFT", 0, -50}, "Button", "OnClick")
-			self.panel.arrowRight = self:addPanelElementMethod("arrowRight", self:buttonCall(true), {"RIGHT", 400, -50}, "Button", "OnClick")
+			self.panel.central = self:addPanelElementItem("central", Const.TrackerCurrent, {"LEFT", self.c.bSizX, self.c.bSizY, X, Y}, "Frame")
+			Y = {0, -8, 0}
+			self.panel.side = self:addPanelElementItem("side", Const.TrackerPast, {"LEFT",  self.c.bSizX, self.c.bSizY, {self.c.bSizX, 0, 0}, Y}, "Frame", true)
+			self.panel.arrowLeft = self:addPanelElementMethod("arrowLeft", self:buttonCall(false), {"LEFT", 0, self.c.bPosY}, "Button", "OnClick")
+			self.panel.arrowRight = self:addPanelElementMethod("arrowRight", self:buttonCall(true), {"RIGHT", self:getWidth(), self.c.bPosY}, "Button", "OnClick")
 
         end
     end)
@@ -56,8 +66,8 @@ function MainM:setupFrame(name)
 	panel.name = name
 
 	panel:SetFrameStrata("BACKGROUND")
-	panel:SetWidth("400")
-	panel:SetHeight("150")
+	panel:SetWidth(self:getWidth())
+	panel:SetHeight(self:getHeight())
 	panel:EnableKeyboard()
 	panel:SetPropagateKeyboardInput(true)
 	panel:SetScript("OnKeyDown", function (arg, key) 
@@ -92,15 +102,15 @@ function MainM:appendCloseBox()
 	return f
 end
 
-function MainM:addPanelElementItem(name, item, position, type)
+function MainM:addPanelElementItem(name, item, position, type, textSpacing)
 	local f = CreateFrame(type, name, self.panel)
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
-	self:displayTrackerElements(position[4], position[5], item, f)
+	self:displayTrackerElements(position[4], position[5], item, f, textSpacing)
 	return f
 end
 
-function MainM:addPanelElementMethod(name, method, position, type, script)
+function MainM:addPanelElementMethod(name, method, position, type, script, textSpacing)
 	local f = CreateFrame(type, name, self.panel)
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
@@ -115,19 +125,26 @@ end
 -- X = {x, sX, valueXPos} => sX for stepX, valueXPos is the marker for positionning the value on X abs (horizontal)
 -- Y = {y, sY, valueYPos} => sy for stepY, valueYPos is the same // on Y (vertical)
 -- This method sets up a system with a label : value displaying date, most common
-function MainM:displayTrackerElements(X, Y, item, frame)
+function MainM:displayTrackerElements(X, Y, item, frame, textSpacing)
     X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
     frame = frame or self.panel
     frame.fontStrings = {}
     for k, v in ipairs(item) do 
 		local key = item[k][1]
 		local value = item[k][2]
-        local linetext = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        linetext:SetPoint("TOPLEFT", X[1], Y[1])
-		linetext:SetText(value)
-        frame.fontStrings[key .. "Text"] = linetext
+		if value ~= nil then
+			local linetext = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+			linetext:SetPoint("TOPLEFT", X[1], Y[1])
+			linetext:SetText(value)
+			linetext:SetJustifyH("left")
+			frame.fontStrings[key .. "Text"] = linetext
+		end
 
         local linevalue = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+		if textSpacing then 
+			linevalue:SetSpacing(math.abs(Y[2]))
+		end
+		linevalue:SetJustifyH("left")
         linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
         frame.fontStrings[key] = linevalue
 
@@ -154,3 +171,4 @@ end
 function MainM:panelSide()
 
 end
+
