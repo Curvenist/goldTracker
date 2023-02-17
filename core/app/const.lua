@@ -23,8 +23,19 @@ Const = {
             {"currentMoney", "Liquidités"},
 			{"netEarning", "Performance"},
 		},
-		TrackerPast = {  -- we will rely on customMoney
-			{"values", nil} -- no text
+		TrackerPast = {  -- we will rely on customMoney -- careful, here object values are not the same in the process, don't rely on it
+			{"day", nil},
+			{"netEarning", nil},
+			{"rating", nil}
+		},
+		CMMMessage = {
+			"Perf Sup!", 
+			"Perf Inf!"
+		},
+		CMMDecoration = {
+			"%value",
+			"%value%",
+			"+%value%"
 		}
 }
 

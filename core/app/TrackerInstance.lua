@@ -20,20 +20,25 @@ function TrackerInstance:new(o)
 	return o
 end
 
-function TrackerInstance:constr()
-	self.date = date("%d%m%Y")
-    self.dailyMoney = 0
-    self.currentMoney = 0
-	self.netEarning = 0
-    self.income = 0
-    self.spending = 0
-    self.netValueD = 0
-    self.netValue = 0
-    self.dailyCatch = false
+function TrackerInstance:constr(o)
+	for k, v in pairs(TrackerInstance) do 
+	if type(v) ~= "function" then
+		if k == "date" then
+			self[k] = o~= nil and o[k] or date("%d%m%Y")
+	elseif k == "dailyCatch" then
+			self[k] = o~= nil and o[k] or false
+		else
+			self[k] = o~= nil and o[k] or 0
+		end
+	end
 end
 
 function TrackerInstance:updateNetEarning(value)
 	self.netEarning = value
+end
+
+function TrackerInstance:findNetEarning()
+	self.netEarning = self.income + self.netValueD + self.netValue - self.spending
 end
 
 -- this function usage allows us to find if there is a difference between last currentMoney recorder with the dailyMoney one, if there is, then we update the nature of income or spending (this one will be catch on netIncome)

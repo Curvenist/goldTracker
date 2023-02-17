@@ -6,14 +6,31 @@ MainM = {
 
 	p = {
 		w = 400,
-		h = 150
+		h = 180,
 	},
+
 	c = {
-		bSizX = 400 / 2,
-		bSizY = 150 / 1.5,
-		bPosY = (150 / 2) * (-1)
+		MulW = function(s, val) return s.p.w * val end,
+		MulH = function(s, val) return s.p.h * val end,
+
+		DivW = function(s, val) if val == 0 then return s.p.w * val end return s.p.w / val end,
+		DivH = function(s, val) if val == 0 then return s.p.h * val end return s.p.h / val end
+	},
+
+	textSize = function(val)
+		local val = val or 0
+		return (val / (val * 0.1) + 1)
+	end,
+
+	position = {
+		"Center",
+		function(s) return s.p.w / 2 end,
+		function(s) return s.p.h / 2 end,
+		{0, 0, 0},
+		{0, 0, 0}
 	}
 }
+
 
 function MainM:getHeight(Height)
 	return self.p.h
@@ -32,17 +49,22 @@ function MainM:main()
 
 			self.panel = self:setupFrame("Bank Account")
 			self.panel.texture = self:addTexture()
-			self.panel:Hide()
+			--self.panel:Hide()
 
 			self.panel.buttonClose = self:appendCloseBox()
+			self.panel.buttonResize = self:appendResizeBorder()
 
-			local X, Y = {0, 0, 100}, {0, -20, 0}
-			self.panel.central = self:addPanelElementItem("central", Const.TrackerCurrent, {"LEFT", self.c.bSizX, self.c.bSizY, X, Y}, "Frame")
-			Y = {0, -8, 0}
-			self.panel.side = self:addPanelElementItem("side", Const.TrackerPast, {"LEFT",  self.c.bSizX, self.c.bSizY, {self.c.bSizX, 0, 0}, Y}, "Frame", true)
-			self.panel.arrowLeft = self:addPanelElementMethod("arrowLeft", self:buttonCall(false), {"LEFT", 0, self.c.bPosY}, "Button", "OnClick")
-			self.panel.arrowRight = self:addPanelElementMethod("arrowRight", self:buttonCall(true), {"RIGHT", self:getWidth(), self.c.bPosY}, "Button", "OnClick")
-
+			local X, Y = {0, 0, 100}, {0, -20, 0} -- don't forget, first is margin, second is step between loops, third is case when there is a "label" : "value" duo
+			local textSize = {false, self.textSize(self.p.h)}
+			self.panel.central = self:addPanelElementItem("central", Const.TrackerCurrent, self:setPosition({"LEFT", 2, (3/2), X, Y}), "Frame", textSize)
+			self.panel.side = {}
+			X, Y = {150, 100, 0}, {0, 0, 0}
+			for k = 1, 7 do
+				self.panel.side[k] = self:addPanelElementItem("side", Const.TrackerPast, self:setPosition({"LEFT", 2, (3/2), X, Y}), "Frame", textSize)
+				Y[1] = Y[1] - 20
+			end
+			self.panel.arrowLeft = self:addPanelElementMethod("arrowLeft", self:buttonCall(false), self:setPosition({"LEFT", 0, (3/2)}), "Button", "OnClick")
+			self.panel.arrowRight = self:addPanelElementMethod("arrowRight", self:buttonCall(true), self:setPosition({"RIGHT", 1, (3/2)}), "Button", "OnClick")
         end
     end)
 end
@@ -61,20 +83,34 @@ function MainM:setupOverlay(addonname)
 		icon:Register(addonname, miniButton)
 end
 
+--@todo we should add options in order to change size, colors etc!
+
 function MainM:setupFrame(name)
 	local panel = CreateFrame("Frame", "main")
 	panel.name = name
 
 	panel:SetFrameStrata("BACKGROUND")
+	panel:SetPoint("CENTER")
 	panel:SetWidth(self:getWidth())
 	panel:SetHeight(self:getHeight())
-	panel:EnableKeyboard()
+	panel:EnableKeyboard(true)
+	panel:EnableMouse(true)
 	panel:SetPropagateKeyboardInput(true)
+	panel:SetMovable(true)
+	panel:SetResizable(true)
+	panel:SetResizeBounds(self.c.DivW(self, 2), self.c.DivH(self, 2), self.c.MulW(self, 2), self.c.MulH(self, 2))
+	panel:SetUserPlaced(true)
+	panel:RegisterForDrag("LeftButton")
 	panel:SetScript("OnKeyDown", function (arg, key) 
 		if key == "ESCAPE" then
 			self.panel:Hide(); self.isShown = false;
 		end end)
-
+	panel:SetScript("OnDragStart", function (arg, key) 
+		arg:StartMoving()
+		end)
+	panel:SetScript("OnDragStop", function (arg, key) 
+		arg:StopMovingOrSizing()
+		end)
 	panel:SetPoint("Center", 0, 0)
 
 	return panel
@@ -102,6 +138,25 @@ function MainM:appendCloseBox()
 	return f
 end
 
+function MainM:appendResizeBorder()
+	local b = CreateFrame("Button", nil, self.panel)
+	b:EnableMouse(true)
+	b:SetSize(16,16)
+	b:SetPoint("BOTTOMRIGHT")
+
+	b:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	b:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	b:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+
+	b:SetScript("OnMouseDown", function(self)
+		b:GetParent():StartSizing("BOTTOMRIGHT") 
+	end)
+	b:SetScript("OnMouseUp", function()
+		b:GetParent():StopMovingOrSizing("BOTTOMRIGHT")
+	end)
+	return b
+end
+
 function MainM:addPanelElementItem(name, item, position, type, textSpacing)
 	local f = CreateFrame(type, name, self.panel)
 	f:SetSize(position[2], position[3])
@@ -122,28 +177,67 @@ function MainM:buttonCall(bool)
 	return 
 end
 
+--[[
+addPanelElementItem explanation :
+1 : "name"
+2 : "properties helping filling data"
+--------
+3 : "{"PanelPosition", "Width", Height, X, Y}"
+X = {"ElemWidth", "ElemIncrementOverloop", "positionOfvalueInCaseOfText"}
+Y = Same as X but for Y
+-------
+4 : type of frame
+5 : textSpacing in order of multiline
+]]--
+
+function MainM:getPosition(index)
+	if index ~= nil then
+	return self.position[index]
+	end
+	return self.position
+end
+
+function MainM:setPosition(array, object)
+	object = self:getPosition()
+	array[1], array[2], array[3], array[4], array[5] = 
+			array[1] or self:getPosition(1),
+			array[2] or self:getPosition(2),
+			array[3] or self:getPosition(3),
+			array[4] or self:getPosition(4),
+			array[5] or self:getPosition(5)
+	
+	object[1] = array[1]
+	object[2] = self.c.DivW(self, array[2])
+	object[3] = self.c.DivH(self, array[3])
+	object[4] = {array[4][1], array[4][2], array[4][3]}
+	object[5] = {array[5][1], array[5][2], array[5][3]}
+	return object
+end
+
 -- X = {x, sX, valueXPos} => sX for stepX, valueXPos is the marker for positionning the value on X abs (horizontal)
 -- Y = {y, sY, valueYPos} => sy for stepY, valueYPos is the same // on Y (vertical)
 -- This method sets up a system with a label : value displaying date, most common
 function MainM:displayTrackerElements(X, Y, item, frame, textSpacing)
-    X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
+    local X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
     frame = frame or self.panel
     frame.fontStrings = {}
     for k, v in ipairs(item) do 
 		local key = item[k][1]
 		local value = item[k][2]
 		if value ~= nil then
-			local linetext = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+			local linetext = frame:CreateFontString(nil, "OVERLAY")
+			linetext:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
 			linetext:SetPoint("TOPLEFT", X[1], Y[1])
 			linetext:SetText(value)
 			linetext:SetJustifyH("left")
 			frame.fontStrings[key .. "Text"] = linetext
 		end
 
-        local linevalue = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-		if textSpacing then 
+        local linevalue = frame:CreateFontString(nil, "OVERLAY")
+		if textSpacing[1] then 
 			linevalue:SetSpacing(math.abs(Y[2]))
 		end
+		linevalue:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
 		linevalue:SetJustifyH("left")
         linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
         frame.fontStrings[key] = linevalue
@@ -171,4 +265,5 @@ end
 function MainM:panelSide()
 
 end
+
 

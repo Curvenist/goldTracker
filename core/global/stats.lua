@@ -153,10 +153,12 @@ function Stats:rating(numerator, denominator)
 	self:incrementDenom(self:getCalculation()[2])
 
 	if self:getNum() == 0 or self:getDenom() == 0 then 
-		return 0
+		return {0, 1}
 	end
-	--local decimal = Money:TruncatedRigth(value, 2)
-	return ((self:getNum() / self:getDenom()) - 1) * 100
+	if self:getNum() < self:getDenom() then 
+		return {(self:getNum() / self:getDenom()) * 100, 2}
+	end
+	return {((self:getNum() / self:getDenom()) - 1) * 100, 3}
 end
 
 

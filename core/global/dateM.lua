@@ -94,6 +94,7 @@ function DateM:dateTranslationPicker(interval, array, vals)
 			if v == interval[1] then
 				vals = {}
 				for l = k, 	k + interval[2], interval[2]/math.abs(interval[2]) do
+					if arrayOfDates[l] == nil then break end -- case we are out of the picture!
 					table.insert(vals, arrayOfDates[l])
 				end
 				break

@@ -2,7 +2,7 @@ Tracker = TrackerInstance:new()
 NewCMM = CMM:new()
 
 function Tracker:popUpData()
-	self.netEarning = self.income + self.netValueD + self.netValue - self.spending
+	Tracker:findNetEarning()
     if MainM.panel.central.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerCurrent) do v = v[1]
         	MainM.panel.central.fontStrings[v]:SetText(Money:ConvertGold(self[v]))
@@ -49,8 +49,7 @@ function Tracker:loginEvent()
 		self:updateNetEarning(self.income + self.netValueD + self.netValue - self.spending)
 
         self:popUpData()
-		-- getReady for inception!!
-		NewCMM:main(2, customMoney)
+		NewCMM:main(7, customMoney)
 		NewCMM:popUpData(NewCMM.timeArray)
     end)
 end
