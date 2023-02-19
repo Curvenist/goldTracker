@@ -2,7 +2,7 @@ MainM = {
     options = true,
     optVal = nil,
     panel = nil,
-	isShown = false,
+	isShown = true,
 
 	p = {
 		w = 400,
@@ -221,26 +221,29 @@ function MainM:displayTrackerElements(X, Y, item, frame, textSpacing)
     local X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
     frame = frame or self.panel
     frame.fontStrings = {}
-    for k, v in ipairs(item) do 
-		local key = item[k][1]
-		local value = item[k][2]
-		if value ~= nil then
-			local linetext = frame:CreateFontString(nil, "OVERLAY")
-			linetext:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
-			linetext:SetPoint("TOPLEFT", X[1], Y[1])
-			linetext:SetText(value)
-			linetext:SetJustifyH("left")
-			frame.fontStrings[key .. "Text"] = linetext
-		end
+	frame.elems = {}
+    for k in ipairs(item) do 
+		local key, value = item[k][1], item[k][2]
+		frame.elems[key] = self:elementCommand(frame, key)
+		if frame.elems[key] ~= nil then
+			if value ~= nil then
+				local linetext = frame:CreateFontString(nil, "OVERLAY")
+				linetext:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
+				linetext:SetPoint("TOPLEFT", X[1], Y[1])
+				linetext:SetText(value)
+				linetext:SetJustifyH("left")
+				frame.fontStrings[key .. "Text"] = linetext
+			end
 
-        local linevalue = frame:CreateFontString(nil, "OVERLAY")
-		if textSpacing[1] then 
-			linevalue:SetSpacing(math.abs(Y[2]))
+			local linevalue = frame:CreateFontString(nil, "OVERLAY")
+			if textSpacing[1] then 
+				linevalue:SetSpacing(math.abs(Y[2]))
+			end
+			linevalue:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
+			linevalue:SetJustifyH("left")
+			linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
+			frame.fontStrings[key] = linevalue
 		end
-		linevalue:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
-		linevalue:SetJustifyH("left")
-        linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
-        frame.fontStrings[key] = linevalue
 
 		X[1] = X[1] + X[2]
         Y[1] = Y[1] + Y[2]
@@ -249,6 +252,17 @@ function MainM:displayTrackerElements(X, Y, item, frame, textSpacing)
 end
 --InterfaceOptions_AddCategory(frame)
 
+-- This function allows us to create quickly objects with a command line in the constant, like drawing a line
+function MainM:elementCommand(frame, value)
+	local l = nil
+	return  GeneralM:case(string.find(value, "%%drawLine") ~= nil, function ()
+			l = frame:CreateLine()
+			l:SetColorTexture(1, 1, 1, 1)
+			l:SetStartPoint("Left")
+			l:SetEndPoint("Center")
+			l:SetThickness(1)
+		 end) and l
+end
 
 --looking for previous day or next day
 -- ArrowLeft if Next is false, Arrow right if next is true

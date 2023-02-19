@@ -42,13 +42,16 @@ function Stats:makeCalculation(Value, operator, perfn)
 	return load("self.calculation[perfn] = self.calculation[perfn]" .. operator .. Value)()
 end
 
-function Stats:getCalculation()
+function Stats:getCalculation(index)
+	if index ~= nil then
+		return self.calculation[index]
+	end
 	return self.calculation
 end
 
 
 function Stats:setSimpleCalculation(Value)
-	self.calculation = Value
+	self.simpleCalc = Value
 end
 
 function Stats:incrementSimpleCalculation(Value)
@@ -96,8 +99,11 @@ function Stats:isPair(value)
 end
 
 
-function Stats:performance(Values) -- a performance returns a variation between data, check review in JANUARY*
-    Values = Values or {}
+-- data will be clustered into arrays to separate days  : {d1, d2...} will be the format
+function Stats:performance(Values, index) -- a performance returns a variation between data, check review in JANUARY*
+    Values, index = Values or {}, index or nil
+	self:resetStats()
+	self:getCalculation()
 	for k, v in pairs(Values) do
 		self:setCalculation(0, k)
 		if type(Values[k]) == "table" then
@@ -108,18 +114,29 @@ function Stats:performance(Values) -- a performance returns a variation between 
 			self:incrementCalculation(v, k)
 		end
 	end
-	return self:getCalculation()
+	self:getCalculation()
 end
 
 -- unCluster = we regoup values in array, ie : {{10}, {15} ...} instead of arrays {{10, 11}, {25, 30, 25} ...}
+
 function Stats:performanceUncluster()
 	self:setSimpleCalculation(0)
 	for k, v in pairs(self:getCalculation()) do
-		for ka, va in pairs(self:getCalculation()[k]) do
+		if type(self:getCalculation(k)) == "table" then
+			for ka, va in pairs(self:getCalculation(k)) do
+				self:incrementSimpleCalculation(va)
+			end	
+		else
 			self:incrementSimpleCalculation(v)
-		end	
+		end
 	end
-	self.setCalculation(self:getSimpleCalculation(), 1)
+end
+
+-- data will be unclustered into arrays to separate days  : returns a number
+function Stats:plainPerformance(Values)
+	self:performance(Values)
+	self:performanceUncluster()
+	return self:getSimpleCalculation()
 end
 
 -- functions for basic calculating (number to number) 
@@ -134,8 +151,8 @@ n - 2 = 20
 we compare ((10 / 15) - 1) * 100
 ]]--
 
-function Stats:rating(numerator, denominator)
-    numerator, denominator = numerator or {0}, denominator or {0}
+function Stats:rating(numerator, denominator, mult)
+    numerator, denominator, mult = numerator or {0}, denominator or {0}, mult or StatsOptions:get("mult") or 100
 	local Values = {numerator, denominator}
 	self:resetStats()
 
@@ -149,16 +166,36 @@ function Stats:rating(numerator, denominator)
 			self:incrementCalculation(v, k)
 		end
 	end
-	self:incrementNum(self:getCalculation()[1])
-	self:incrementDenom(self:getCalculation()[2])
+	self:incrementNum(self:getCalculation(1))
+	self:incrementDenom(self:getCalculation(2))
 
 	if self:getNum() == 0 or self:getDenom() == 0 then 
-		return {0, 1}
+		return 0
 	end
-	if self:getNum() < self:getDenom() then 
-		return {(self:getNum() / self:getDenom()) * 100, 2}
+
+	if self:getNum() > self:getDenom() then
+		return (((self:getNum() / self:getDenom())) - 1) * mult
 	end
-	return {((self:getNum() / self:getDenom()) - 1) * 100, 3}
+	local val = self:getNum() / self:getDenom()
+	return 	((val >= 0 and self:getNum() > self:getDenom()) and (val - 1) * mult) or
+			((val < 0 and self:getNum() < self:getDenom()) and (val + 1) * mult) or 
+			val * mult
+end
+
+function Stats:ratingDecoration(val1, val2, mult)
+	val1, val2, mult = 
+	 val1 and self:setNum(val1) or self:getNum(),
+	 val2 and self:setDenom(val2) or self:getDenom(),
+	 mult or StatsOptions:get("mult") or 100
+	local i = nil
+	if mult ~= 100 then i = 4 end
+	if self:getNum() == 0 or self:getDenom() == 0 then 
+		return {0, i or 1}
+	end
+	if self:getNum() < self:getDenom() and self:getNum() / self:getDenom() > 0 then 
+		return {(self:getNum() / self:getDenom()) * mult, i or 2}
+	end
+	return {((self:getNum() / self:getDenom())) * mult, i or 3}
 end
 
 
@@ -166,8 +203,9 @@ function Stats:average(Values)
     Values = Values or {}
 	self:resetStats()
 	self:performance(Values)
+	self:performanceUncluster()
 
-    return self:performanceUncluster()[1] / #Values
+    return self:getSimpleCalculation() / #Values
 end
 
 

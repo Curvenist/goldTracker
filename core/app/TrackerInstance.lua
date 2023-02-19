@@ -21,16 +21,18 @@ function TrackerInstance:new(o)
 end
 
 function TrackerInstance:constr(o)
+    o = o or nil
 	for k, v in pairs(TrackerInstance) do 
-	if type(v) ~= "function" then
-		if k == "date" then
-			self[k] = o~= nil and o[k] or date("%d%m%Y")
-	elseif k == "dailyCatch" then
-			self[k] = o~= nil and o[k] or false
-		else
-			self[k] = o~= nil and o[k] or 0
-		end
-	end
+        if type(v) ~= "function" then
+            if k == "date" then
+                self[k] = o ~= nil and o[k] or date("%d%m%Y")
+        elseif k == "dailyCatch" then
+                self[k] = o ~= nil and o[k] or false
+            else
+                self[k] = o ~= nil and o[k] or 0
+            end
+        end
+    end
 end
 
 function TrackerInstance:updateNetEarning(value)

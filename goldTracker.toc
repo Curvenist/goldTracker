@@ -17,6 +17,7 @@ core/global/stats.lua
 
 core/interface/mainM.lua
 
+core/app/options.lua
 core/app/const.lua
 core/app/money.lua
 core/app/CMM.lua

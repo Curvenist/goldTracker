@@ -21,12 +21,15 @@ Const = {
 		},
         TrackerCurrent = { 
             {"currentMoney", "Liquidités"},
+			{"income", "Revenu"},
+			{"spending", "Dépense"},
+			{"%drawLine"},
 			{"netEarning", "Performance"},
 		},
 		TrackerPast = {  -- we will rely on customMoney -- careful, here object values are not the same in the process, don't rely on it
 			{"day", nil},
 			{"netEarning", nil},
-			{"rating", nil}
+			{"stat", nil}
 		},
 		CMMMessage = {
 			"Perf Sup!", 
@@ -35,7 +38,8 @@ Const = {
 		CMMDecoration = {
 			"%value",
 			"%value%",
-			"+%value%"
+			"+%value%",
+			"%value(/%mult)",
 		}
 }
 

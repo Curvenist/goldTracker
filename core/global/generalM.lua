@@ -1,7 +1,11 @@
 GeneralM = {
     test = nil,
 	allowedOperators = {"+", "-", "*", "/", "%", "^"},
-	dateItems = {}
+	dateItems = {},
+	commands = {
+		"%%drawLine",
+		"%%hardSpace"
+	}
 }
 
 function GeneralM:tableContains(tab, val)
@@ -21,25 +25,9 @@ function GeneralM:case(tester, callback)
 	return false
 end
 
-
---[[
-	local i = 1
-	
-	for k = 1, 1 do
-		if case(i == 1, 
-			function () i = 2; print(i) end)
-		then break end
-		if case(i >= 2, 
-			function () i = 3; print(i) end)
-		then end
-		if case(i == 3,
-			function () print("test") end)
-		then break end
-		if case("default", 
-			function () print("default type") end)
-		then break end
+function GeneralM:isNotCommand(value)
+	for k, v in pairs(self.commands) do
+		if self:case(string.find(value, v) ~= nil, function () end) then return false end
 	end
-	
-	print("fin")
-]]--
-		
+	return true
+end

@@ -5,7 +5,9 @@ function Tracker:popUpData()
 	Tracker:findNetEarning()
     if MainM.panel.central.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerCurrent) do v = v[1]
-        	MainM.panel.central.fontStrings[v]:SetText(Money:ConvertGold(self[v]))
+            if GeneralM:isNotCommand(v) then
+        	    MainM.panel.central.fontStrings[v]:SetText(Money:ConvertGold(self[v]))
+            end
 		end
     end
 end
@@ -48,9 +50,10 @@ function Tracker:loginEvent()
         end
 		self:updateNetEarning(self.income + self.netValueD + self.netValue - self.spending)
 
-        self:popUpData()
+        
 		NewCMM:main(7, customMoney)
-		NewCMM:popUpData(NewCMM.timeArray)
+            self:popUpData()
+            NewCMM:popUpData(NewCMM.timeArray)
     end)
 end
 
@@ -64,8 +67,8 @@ function Tracker:RecordMoney()
         self:updateFlux(amount)
         self.currentMoney = self:GetMoney() --updating Our Current money
 		self:updateNetEarning(self.income + self.netValueD + self.netValue - self.spending)
-        self:popUpData()
-		NewCMM:popUpData(NewCMM.timeArray)
+            self:popUpData()
+            NewCMM:popUpData(NewCMM.timeArray)
     end)
 end
 
