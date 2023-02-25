@@ -23,9 +23,9 @@ MainM = {
 	end,
 
 	position = {
-		"Center",
-		function(s) return s.p.w / 2 end,
-		function(s) return s.p.h / 2 end,
+		"CENTER",
+		function(s, x) return s.p.w / x end,
+		function(s, x) return s.p.h / x end,
 		{0, 0, 0},
 		{0, 0, 0}
 	}
@@ -46,25 +46,26 @@ function MainM:main()
     f:SetScript("OnEvent", function(___, event, addonname)
         if addonname == "goldTracker" then
 			self:setupOverlay(addonname) --library
+			local textSize = {false, self.textSize(self.p.h)}
 
 			self.panel = self:setupFrame("Bank Account")
 			self.panel.texture = self:addTexture()
 			--self.panel:Hide()
 
-			self.panel.buttonClose = self:appendCloseBox()
+			self.panel.buttonClose = self:appendCloseBox(textSize)
 			self.panel.buttonResize = self:appendResizeBorder()
 
-			local X, Y = {0, 0, 100}, {0, -20, 0} -- don't forget, first is margin, second is step between loops, third is case when there is a "label" : "value" duo
-			local textSize = {false, self.textSize(self.p.h)}
-			self.panel.central = self:addPanelElementItem("central", Const.TrackerCurrent, self:setPosition({"LEFT", 2, (3/2), X, Y}), "Frame", textSize)
-			self.panel.side = {}
-			X, Y = {150, 100, 0}, {0, 0, 0}
-			for k = 1, 7 do
-				self.panel.side[k] = self:addPanelElementItem("side", Const.TrackerPast, self:setPosition({"LEFT", 2, (3/2), X, Y}), "Frame", textSize)
-				Y[1] = Y[1] - 20
-			end
-			self.panel.arrowLeft = self:addPanelElementMethod("arrowLeft", self:buttonCall(false), self:setPosition({"LEFT", 0, (3/2)}), "Button", "OnClick")
-			self.panel.arrowRight = self:addPanelElementMethod("arrowRight", self:buttonCall(true), self:setPosition({"RIGHT", 1, (3/2)}), "Button", "OnClick")
+			-- don't forget, first is margin, second is step between loops, third is case when there is a "label" : "value" duo
+			local X, Y = {0, 0, 100}, {0, -20, 0} 
+			
+			self.panel.central = self:addPanelElementItem("central", Const.TrackerCurrent, self:setPosition({"TOPLEFT", 2, 1.5, X, Y}), "Frame", textSize)
+			
+			X, Y = {150, 0, 100}, {0, -20, 0}
+
+			self.panel.side = self:addPanelElementItem("side", Const.AdvancedStatOp, self:setPosition({"TOPLEFT", 2, 1.5, X, Y}), "Frame", textSize)
+
+			self.panel.arrowLeft = self:addPanelElementMethod("arrowLeft", self:buttonCall(false), self:setPosition({"LEFT", 0, 1.5}), "Button", "OnClick")
+			self.panel.arrowRight = self:addPanelElementMethod("arrowRight", self:buttonCall(true), self:setPosition({"RIGHT", 1, 1.5}), "Button", "OnClick")
         end
     end)
 end
@@ -79,8 +80,8 @@ function MainM:setupOverlay(addonname)
 					return
 				end
 		})
-		local icon = LibStub("LibDBIcon-1.0", true)
-		icon:Register(addonname, miniButton)
+	local icon = LibStub("LibDBIcon-1.0", true)
+	icon:Register(addonname, miniButton)
 end
 
 --@todo we should add options in order to change size, colors etc!
@@ -111,7 +112,7 @@ function MainM:setupFrame(name)
 	panel:SetScript("OnDragStop", function (arg, key) 
 		arg:StopMovingOrSizing()
 		end)
-	panel:SetPoint("Center", 0, 0)
+	panel:SetPoint("CENTER", 0, 0)
 
 	return panel
 end
@@ -124,14 +125,16 @@ function MainM:addTexture()
 	return t
 end
 
-function MainM:appendCloseBox()
+function MainM:appendCloseBox(textSpacing)
 	local f = CreateFrame("Button", nil, self.panel)
-	f:SetSize("15", "15")
+	f:SetSize(textSpacing[2], textSpacing[2])
 	f:SetPoint("TOPRIGHT", 0, 0)
 
-	local t = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	local t = f:CreateFontString(nil, "OVERLAY")
+	t:SetFont(OptInt:get("font"), textSpacing[2] or 11)
 	t:SetPoint("TOP", 0, 0)
 	t:SetText("x")
+	
 	f.fontString = t
 	
 	f:SetScript("OnClick", function () self.panel:Hide(); self.isShown = false; return end)
@@ -161,9 +164,10 @@ function MainM:addPanelElementItem(name, item, position, type, textSpacing)
 	local f = CreateFrame(type, name, self.panel)
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
-	self:displayTrackerElements(position[4], position[5], item, f, textSpacing)
+	self:displayMenuElements(position[4], position[5], item, f, textSpacing, name)
 	return f
 end
+
 
 function MainM:addPanelElementMethod(name, method, position, type, script, textSpacing)
 	local f = CreateFrame(type, name, self.panel)
@@ -196,7 +200,7 @@ function MainM:getPosition(index)
 	end
 	return self.position
 end
-
+-- in order of array : width, height, X, Y
 function MainM:setPosition(array, object)
 	object = self:getPosition()
 	array[1], array[2], array[3], array[4], array[5] = 
@@ -217,49 +221,57 @@ end
 -- X = {x, sX, valueXPos} => sX for stepX, valueXPos is the marker for positionning the value on X abs (horizontal)
 -- Y = {y, sY, valueYPos} => sy for stepY, valueYPos is the same // on Y (vertical)
 -- This method sets up a system with a label : value displaying date, most common
-function MainM:displayTrackerElements(X, Y, item, frame, textSpacing)
+function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
     local X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
     frame = frame or self.panel
     frame.fontStrings = {}
 	frame.elems = {}
-    for k in ipairs(item) do 
-		local key, value = item[k][1], item[k][2]
-		frame.elems[key] = self:elementCommand(frame, key)
-		if frame.elems[key] ~= nil then
+	local createElement = function (increment, key, value) 
+		frame.elems[name] = self:elementCommand(frame, key, X, Y)
+		if type(frame.elems[name]) ~= "table" then
 			if value ~= nil then
 				local linetext = frame:CreateFontString(nil, "OVERLAY")
-				linetext:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
+				linetext:SetFont(OptInt:get("font"), textSpacing[2] or 11)
 				linetext:SetPoint("TOPLEFT", X[1], Y[1])
 				linetext:SetText(value)
 				linetext:SetJustifyH("left")
-				frame.fontStrings[key .. "Text"] = linetext
+				frame.fontStrings[key .. increment .. "Text"] = linetext
 			end
 
 			local linevalue = frame:CreateFontString(nil, "OVERLAY")
 			if textSpacing[1] then 
 				linevalue:SetSpacing(math.abs(Y[2]))
 			end
-			linevalue:SetFont("Fonts\\ARIALN.TTF", textSpacing[2] or 11)
+			linevalue:SetFont(OptInt:get("font"), textSpacing[2] or 11)
 			linevalue:SetJustifyH("left")
 			linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
-			frame.fontStrings[key] = linevalue
+			frame.fontStrings[key .. increment] = linevalue
 		end
-
 		X[1] = X[1] + X[2]
         Y[1] = Y[1] + Y[2]
-    end
+	end
+	for k in pairs(item) do 
+		if type(item[k]) == "table" then
+			createElement(k, item[k][1], item[k][2])
+		else
+			createElement(k, item[k])
+		end
+	end
+
+
 	return frame
 end
 --InterfaceOptions_AddCategory(frame)
 
 -- This function allows us to create quickly objects with a command line in the constant, like drawing a line
-function MainM:elementCommand(frame, value)
-	local l = nil
+function MainM:elementCommand(frame, value, X, Y)
+	local l, width = nil, (self.p.w / 3)
+
 	return  GeneralM:case(string.find(value, "%%drawLine") ~= nil, function ()
 			l = frame:CreateLine()
 			l:SetColorTexture(1, 1, 1, 1)
-			l:SetStartPoint("Left")
-			l:SetEndPoint("Center")
+			l:SetStartPoint("TOP", X[1] - (width * 0.60), Y[1])
+			l:SetEndPoint("TOP", X[1] + (width * 0.20), Y[1])
 			l:SetThickness(1)
 		 end) and l
 end

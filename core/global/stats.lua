@@ -118,7 +118,6 @@ function Stats:performance(Values, index) -- a performance returns a variation b
 end
 
 -- unCluster = we regoup values in array, ie : {{10}, {15} ...} instead of arrays {{10, 11}, {25, 30, 25} ...}
-
 function Stats:performanceUncluster()
 	self:setSimpleCalculation(0)
 	for k, v in pairs(self:getCalculation()) do
@@ -152,7 +151,7 @@ we compare ((10 / 15) - 1) * 100
 ]]--
 
 function Stats:rating(numerator, denominator, mult)
-    numerator, denominator, mult = numerator or {0}, denominator or {0}, mult or StatsOptions:get("mult") or 100
+    numerator, denominator, mult = numerator or {0}, denominator or {0}, mult or OptStats:get("mult") or 100
 	local Values = {numerator, denominator}
 	self:resetStats()
 
@@ -173,29 +172,27 @@ function Stats:rating(numerator, denominator, mult)
 		return 0
 	end
 
-	if self:getNum() > self:getDenom() then
-		return (((self:getNum() / self:getDenom())) - 1) * mult
+	if mult + ((self:getNum() - self:getDenom()) / math.abs(self:getDenom())) * mult > mult then
+		return ((self:getNum() / self:getDenom()) * mult) - mult
 	end
-	local val = self:getNum() / self:getDenom()
-	return 	((val >= 0 and self:getNum() > self:getDenom()) and (val - 1) * mult) or
-			((val < 0 and self:getNum() < self:getDenom()) and (val + 1) * mult) or 
-			val * mult
+	return mult + (((self:getNum() - self:getDenom()) / math.abs(self:getDenom())) * mult)
+
 end
 
 function Stats:ratingDecoration(val1, val2, mult)
 	val1, val2, mult = 
 	 val1 and self:setNum(val1) or self:getNum(),
 	 val2 and self:setDenom(val2) or self:getDenom(),
-	 mult or StatsOptions:get("mult") or 100
+	 mult or OptStats:get("mult") or 100
 	local i = nil
 	if mult ~= 100 then i = 4 end
 	if self:getNum() == 0 or self:getDenom() == 0 then 
 		return {0, i or 1}
 	end
-	if self:getNum() < self:getDenom() and self:getNum() / self:getDenom() > 0 then 
-		return {(self:getNum() / self:getDenom()) * mult, i or 2}
+	if mult + ((self:getNum() - self:getDenom()) / math.abs(self:getDenom())) * mult > mult then
+		return {((self:getNum() / self:getDenom()) * mult) - mult, i or 3}
 	end
-	return {((self:getNum() / self:getDenom())) * mult, i or 3}
+	return {((self:getNum() / self:getDenom())) * mult, i or 2}
 end
 
 

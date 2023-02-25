@@ -2,11 +2,11 @@ Tracker = TrackerInstance:new()
 NewCMM = CMM:new()
 
 function Tracker:popUpData()
-	Tracker:findNetEarning()
+	Tracker:find("netEarning")
     if MainM.panel.central.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerCurrent) do v = v[1]
             if GeneralM:isNotCommand(v) then
-        	    MainM.panel.central.fontStrings[v]:SetText(Money:ConvertGold(self[v]))
+        	    MainM.panel.central.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
             end
 		end
     end
@@ -48,12 +48,11 @@ function Tracker:loginEvent()
             self:catchupDaily() -- for setting netValueD
             self.dailyCatch = true
         end
-		self:updateNetEarning(self.income + self.netValueD + self.netValue - self.spending)
+		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
 
-        
-		NewCMM:main(7, customMoney)
-            self:popUpData()
-            NewCMM:popUpData(NewCMM.timeArray)
+        self:popUpData()
+        NewCMM:main(customMoney)
+        NewCMM:popUpDataAdvanced()
     end)
 end
 
@@ -66,9 +65,9 @@ function Tracker:RecordMoney()
         local amount = self.currentMoney - self:GetMoney()
         self:updateFlux(amount)
         self.currentMoney = self:GetMoney() --updating Our Current money
-		self:updateNetEarning(self.income + self.netValueD + self.netValue - self.spending)
-            self:popUpData()
-            NewCMM:popUpData(NewCMM.timeArray)
+		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
+        self:popUpData()
+        NewCMM:popUpDataAdvanced()
     end)
 end
 

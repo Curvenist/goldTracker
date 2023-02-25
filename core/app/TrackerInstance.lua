@@ -35,12 +35,16 @@ function TrackerInstance:constr(o)
     end
 end
 
-function TrackerInstance:updateNetEarning(value)
-	self.netEarning = value
+function TrackerInstance:update(index, value)
+	self[index] = value
 end
 
-function TrackerInstance:findNetEarning()
-	self.netEarning = self.income + self.netValueD + self.netValue - self.spending
+function TrackerInstance:find(index)
+    index = index or "income"
+    if index == "netEarning" then
+        self[index] = self.income + self.netValueD + self.netValue - self.spending
+    end
+    return self[index]
 end
 
 -- this function usage allows us to find if there is a difference between last currentMoney recorder with the dailyMoney one, if there is, then we update the nature of income or spending (this one will be catch on netIncome)

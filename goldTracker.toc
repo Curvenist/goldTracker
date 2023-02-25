@@ -10,19 +10,19 @@ libs/LibDBIcon-1.0/LibDBIcon-1.0/lib.xml
 libs/LibGraph-2.0/LibStub.lua
 libs/LibGraph-2.0/LibGraph-2.0/LibGraph-2.0.lua
 
-
-core/global/dateM.lua
 core/global/generalM.lua
+core/global/dateM.lua
 core/global/stats.lua
 
+core/interface/optionsInterface.lua
 core/interface/mainM.lua
 
-core/app/options.lua
 core/app/const.lua
+core/app/optionsApp.lua
 core/app/money.lua
 core/app/CMM.lua
-core/app/trackerInstance.lua
+core/app/TrackerInstance.lua
 core/app/tracker.lua
+core/global/generalM.lua
 
 core/ordering.lua
-

@@ -1,62 +1,63 @@
-CMMOptions = {
+OptCMM = {
 	incomeNature = 1,
 	statsMethod = 1,
 	comparison = 1
 }
 
-function CMMOptions:set(property, value)
+function OptCMM:set(property, value)
 	self[property] = value
 end
 
-function CMMOptions:get(property)
+function OptCMM:get(property)
 	if property ~= nil then
 		return self[property]
 	end
 	return self
 end
 
-MoneyOptions = {
+OptMoney = {
 
 }
 
-function MoneyOptions:set(property, value)
+function OptMoney:set(property, value)
 	self[property] = value
 end
 
-function MoneyOptions:get(property)
+function OptMoney:get(property)
 	if property ~= nil then
 		return self[property]
 	end
 	return self
 end
 
-TrackerOptions = {
+OptTracker = {
 
 }
 
-function TrackerOptions:set(property, value)
+function OptTracker:set(property, value)
 	self[property] = value
 end
 
-function TrackerOptions:get(property)
+function OptTracker:get(property)
 	if property ~= nil then
 		return self[property]
 	end
 	return self
 end
 
-StatsOptions = {
+OptStats = {
 	mult = 100
 }
 
-function StatsOptions:set(property, value)
+function OptStats:set(property, value)
 	self[property] = value
 end
 
-function StatsOptions:get(property)
+function OptStats:get(property)
 	if property ~= nil then
 		return self[property]
 	end
 	return self
 end
+
 

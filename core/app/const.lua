@@ -9,7 +9,7 @@ Const = {
 			{"Greet", "Bonjour %player, voici le récapitulatif de votre activité :"},
 			{"Performance", "Performance"},
 		},
-		-- From here, we have labelling data, works well with MenuM.displayTrackerElements, putting nothing in translation will result in having no translation
+		-- From here, we have labelling data, works well with MenuM.displayMenuElements, putting nothing in translation will result in having no translation
 		MenuItems = {
 			{"DailyRecap", "Résumé"}, -- afficher en plus : performance moyenne sur 7 jours, moyenne des gains sur 7 jours
 			{"Weekly", "Hebdomadaire"}, -- graph
@@ -25,11 +25,32 @@ Const = {
 			{"spending", "Dépense"},
 			{"%drawLine"},
 			{"netEarning", "Performance"},
+			{"%rating", "Moyenne / semaine"}
 		},
-		TrackerPast = {  -- we will rely on customMoney -- careful, here object values are not the same in the process, don't rely on it
+		History = {  -- we will rely on customMoney -- careful, here object values are not the same in the process, don't rely on it
 			{"day", nil},
 			{"netEarning", nil},
 			{"stat", nil}
+		},
+		AdvancedStatOp = { --this object should only allow arithmetic values in the end
+			{"%outfn:CMM:weekScope", "récapitulatif Hebdomadaire"}, -- our Week Scope
+			{"%fn:Stats:average", "Moyenne"},
+			{"%fn:Stats:plainPerformance", "Somme"},
+			{"%drawLine"},
+			{"%outfn:CMM:monthScope", "récapitulatif mensuel"}, -- in any case, our current Month scope
+			{"%fn:Stats:average", "Moyenne"},
+			{"%fn:Stats:plainPerformance", "Somme"},
+			{"%drawLine"},
+			{"%outfn:CMM:monthPrevScope", "rappel de récapitulatif mensuel"}, -- this is for checking case we have first week of the month, we get the previous one!
+			{"%fn:Stats:average", "Moyenne"},
+			{"%fn:Stats:plainPerformance", "Somme"}
+		},
+		AdvancedStat = {
+			{"name", nil},
+			{"value", nil},
+		},
+		ElementDecoration = {
+			{"%drawLine"}
 		},
 		CMMMessage = {
 			"Perf Sup!", 

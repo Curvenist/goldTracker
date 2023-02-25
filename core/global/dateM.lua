@@ -65,9 +65,11 @@ function DateM:datePicker(datePicker, interval, array, vals) -- prendre un inter
 	if #datePicker ~= 0 then
 		arrayOfDates = datePicker
 	end
-	if #interval == 2 then
-		for k, v in pairs(arrayOfDates) do
-			table.insert(vals, v)
+	if #interval ~= 2 then
+		for k, v in pairs(datePicker) do
+			for k2, v2 in pairs(array) do
+				if v2 == v then table.insert(vals, v) break end
+			end
 		end
 	else
 		for k, v in pairs(arrayOfDates) do
@@ -94,8 +96,9 @@ function DateM:dateTranslationPicker(interval, array, vals)
 			if v == interval[1] then
 				vals = {}
 				for l = k, 	k + interval[2], interval[2]/math.abs(interval[2]) do
-					if arrayOfDates[l] == nil then break end -- case we are out of the picture!
-					table.insert(vals, arrayOfDates[l])
+					if arrayOfDates[l] ~= nil then 
+						table.insert(vals, arrayOfDates[l]) 
+					end
 				end
 				break
 			end
@@ -111,7 +114,7 @@ end
 function DateM:dateMathPicker(daysOfWeek, occurences, array, vals)
     daysOfWeek, occurences, array, vals = daysOfWeek or {}, occurences or {}, array or self.dateItems, {}
 
-	local i, vIsMet, iMax, WeekCapture = 0, false, nil, os.date("%W", occurences[1])
+	local i, vIsMet, iMax, WeekCapture = 0, false, nil, date("%W", occurences[1])
 
 	if occurences[2] ~= nil and occurences[2] == false then 
 		array = DateM:orderArray(array, true)
@@ -123,16 +126,16 @@ function DateM:dateMathPicker(daysOfWeek, occurences, array, vals)
     for k, v in pairs(array) do
 		if v == occurences[1] then vIsMet = true end
         if vIsMet then
-			if WeekCapture ~= os.date("%W", v) then -- WeekCaputure is the indicator of our currentWeek cusor, i is the stepper, iMax is the floor or ceil
+			if WeekCapture ~= date("%W", v) then -- WeekCaputure is the indicator of our currentWeek cusor, i is the stepper, iMax is the floor or ceil
 				if iMax == 0 then break end
 
 				if occurences[2] then i = i + 1
 				elseif not occurences[2] then i = i - 1 end
-				WeekCapture = os.date("%W", v)
+				WeekCapture = date("%W", v)
 			end
 			if iMax == nil or math.abs(i) <= math.abs(iMax) then -- Starting to add recursive
 				for l, m in pairs(daysOfWeek) do
-					if os.date("%w", v) == tostring(m) then
+					if date("%w", v) == tostring(m) then
 						table.insert(vals, v)
 					end
 				end
@@ -163,4 +166,56 @@ function DateM:checkLastCoDate(TrackerDate)
         return TrackerDate
      end
     return originDiff[1]
+end
+
+--WeekSegmentation allows us isolate the previous week data
+function DateM:WeekSegmentation(timestamp, dayStart, nbDays, array)
+	nbDays, dayStart, array = nbDays or 7, dayStart or 3, array or {}
+	timestamp = timestamp or self:convertToDateType(self:timeChecker(date("%d%m%Y")))
+	
+	local currentDay = tonumber(date("%w", timestamp))
+	
+	if currentDay < dayStart then 
+		currentDay = nbDays + currentDay
+	end
+	if currentDay ~= dayStart then
+	  timestamp = timestamp - (24 * 60 * 60)*(currentDay-dayStart)
+	end
+	for i = 1, nbDays do
+	  array[i] = timestamp - (24 * 60 * 60)*i
+	end
+
+	return array
+end
+
+function DateM:MonthSegmentation(timestamp, dayStart, nbDays, array)
+	nbDays, dayStart, array = nbDays or 7, dayStart or 3, array or {}
+	timestamp = timestamp or self:convertToDateType(self:timeChecker(date("%d%m%Y")))
+	
+	local currentMonth = tonumber(date("%m", timestamp))
+	local currentDay = tonumber(date("%w", timestamp))
+	
+	if currentDay < dayStart then 
+		currentDay = nbDays + currentDay
+	end
+	if currentDay ~= dayStart then
+	  timestamp = timestamp - (24 * 60 * 60)*(currentDay-dayStart)
+	end
+
+	local checkM, check = tonumber(date("%m", timestamp)), true
+	local starting, ending = 1, 7
+
+	while check == true do
+		checkM = tonumber(date("%m", difftime(timestamp, (24 * 60 * 60)*ending)))
+		if checkM ~= currentMonth then 
+		  check = false
+		end
+		for i = starting, ending do 
+		  array[i] = difftime(timestamp, (24 * 60 * 60)*i)
+		end
+		starting = ending
+		ending = ending + ending
+	  end
+
+	return array
 end
