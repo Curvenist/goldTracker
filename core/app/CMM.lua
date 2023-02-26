@@ -2,7 +2,7 @@
 CMM = {
 	data = nil,
 	timeArray = {},
-	limits = {10^4, -10^4},
+	limits = {10^3, -10^3},
 
 	storeVal = {},
 	keepVal = {},
@@ -75,7 +75,7 @@ function CMM:initTimeArrayInterval(val)
 	self:setTimeArray(self:getInterval(val))
 end
 
-function CMM:popUpDataAdvanced(array)
+function CMM:popUpStaticReport()
 	local panel, incomeType = MainM.panel.side, self.options["incomeNature"]
 	-- first, we need to create statistics, so we need to take the incomeType, store it and sens it to the stat function to get the result
 	if panel ~= nil then
@@ -96,16 +96,20 @@ function CMM:popUpDataAdvanced(array)
 					local data = GeneralM:executeCommand(isFunctionPart[1], isFunctionPart[2], args) --our function executed by a load
 					self:setStoreVal(v[2], 1) -- the label
 					self:setStoreVal(Money:ConvertGold(data), 2) -- our value
-					self:setKeepVal(self:getStoreVal(2))
+					self:setKeepVal(data)
 					panel.fontStrings[v[1] .. k]:SetText(self:getStoreVal(2))
 				end
 				end
 			end
 		end
 	end
-	local panelCentral = MainM.panel.central.fontStrings
+
+end
+
+function CMM:popUpDataCompared()
+	local panelCentral, incomeType = MainM.panel.central.fontStrings, self.options["incomeNature"]
 	if panelCentral ~= nil then
-		local result = self.statCalcul(Tracker:find(incomeType), self:getKeepVal(1))
+		local result = {self.statDevi:rating(Tracker:find(incomeType), self:getKeepVal(1)), 1}
 		local translate = self:translate(result, Tracker:find(incomeType), self:getKeepVal(1))
 		local gradient = self:processGradient(translate[3], OptStats:get("mult"))
 
@@ -130,7 +134,6 @@ end
 function CMM:translate(result, val1, val2, obj, val)
 	local plainPerf = Money:ConvertGold(self.statDevi:plainPerformance({{val1, -val2}}))
 	val = Money:orderOfComparison(result[1], {self:getLimit(1), self:getLimit(2)}, {plainPerf})
-
 	local mathVal = self.statDevi:rating(val1, val2)
 	if result[2] == 1 then
 		if val ~= plainPerf and val ~= 0 then
@@ -229,6 +232,10 @@ function CMM:getKeepVal(index)
 		return self.keepVal[index]
 	end
 	return self.keepVal
+end
+
+function CMM:resetKeepVal()
+	self.keepVal = {}
 end
 
 function CMM:setKeepVal(value, index)

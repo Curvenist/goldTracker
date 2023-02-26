@@ -52,7 +52,8 @@ function Tracker:loginEvent()
 
         self:popUpData()
         NewCMM:main(customMoney)
-        NewCMM:popUpDataAdvanced()
+        NewCMM:popUpStaticReport()
+        NewCMM:popUpDataCompared()
     end)
 end
 
@@ -67,7 +68,7 @@ function Tracker:RecordMoney()
         self.currentMoney = self:GetMoney() --updating Our Current money
 		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
         self:popUpData()
-        NewCMM:popUpDataAdvanced()
+        NewCMM:popUpDataCompared()
     end)
 end
 
