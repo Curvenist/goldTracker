@@ -3,6 +3,7 @@ GeneralM = {
 	allowedOperators = {"+", "-", "*", "/", "%", "^"},
 	dateItems = {},
 	commands = {
+		"%%",
 		"%%drawLine", -- draw a line
 		"%%rating", 
 		"%%label", -- is only a label

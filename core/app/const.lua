@@ -25,7 +25,8 @@ Const = {
 			{"spending", "Dépense"},
 			{"%drawLine"},
 			{"netEarning", "Performance"},
-			{"%rating", "Moyenne / semaine"}
+			{"%rating", "Perf / moyenne n-1"},
+			{"%sum", "Cumul Hebdomadaire"}
 		},
 		History = {  -- we will rely on customMoney -- careful, here object values are not the same in the process, don't rely on it
 			{"day", nil},

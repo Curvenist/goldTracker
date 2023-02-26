@@ -5,7 +5,8 @@ CMM = {
 	limits = {10^3, -10^3},
 
 	storeVal = {},
-	keepVal = {},
+	storeOperation = {},
+	storeTI = {},
 
 	statistics = {},
 	options = {},
@@ -55,6 +56,11 @@ elseif self.options["statsMethod"] == 2 then
 
 end
 
+function CMM:actualWeekScope(TrackerDate)
+	self:setTimeArray(DateM:CurrentWeekDays(TrackerDate, 3, 7))
+	DateM:datePicker(self:getTimeArray(), {}, self.data)
+end
+
 function CMM:weekScope(TrackerDate)
 	self:setTimeArray(DateM:WeekSegmentation(TrackerDate, 3, 7))
 	DateM:datePicker(self:getTimeArray(), {}, self.data)
@@ -96,7 +102,7 @@ function CMM:popUpStaticReport()
 					local data = GeneralM:executeCommand(isFunctionPart[1], isFunctionPart[2], args) --our function executed by a load
 					self:setStoreVal(v[2], 1) -- the label
 					self:setStoreVal(Money:ConvertGold(data), 2) -- our value
-					self:setKeepVal(data)
+					self:setstoreOperation(data)
 					panel.fontStrings[v[1] .. k]:SetText(self:getStoreVal(2))
 				end
 				end
@@ -109,13 +115,22 @@ end
 function CMM:popUpDataCompared()
 	local panelCentral, incomeType = MainM.panel.central.fontStrings, self.options["incomeNature"]
 	if panelCentral ~= nil then
-		local result = {self.statDevi:rating(Tracker:find(incomeType), self:getKeepVal(1)), 1}
-		local translate = self:translate(result, Tracker:find(incomeType), self:getKeepVal(1))
+		local result = {self.statDevi:rating(Tracker:find(incomeType), self:getstoreOperation(1)), 1}
+		local translate = self:translate(result, Tracker:find(incomeType), self:getstoreOperation(1))
 		local gradient = self:processGradient(translate[3], OptStats:get("mult"))
 
 		if translate[2] >= 0 then panelCentral["%rating6"]:SetTextColor(gradient, 1, gradient, 1)
 		elseif translate[2] < 0 then panelCentral["%rating6"]:SetTextColor(1, 1, 1 - gradient, 1) end
         panelCentral["%rating6"]:SetText(translate[1])
+
+		if #self:getstoreTI() < 1 then
+			for i, j in pairs(self:getTimeArray()) do
+				self.HistoryTI:constr(self.data[self:getTimeArray(i)]) self.HistoryTI:find(incomeType)
+				self:setstoreTI(self.HistoryTI[incomeType], i)
+			end
+		end
+		result = self.statDevi:plainPerformance(self:getstoreTI())
+        panelCentral["%sum7"]:SetText(Money:ConvertGold(result))
     end
 end
 
@@ -227,23 +242,42 @@ function CMM:setStoreVal(value, index)
 	self.storeVal[index] = value
 end
 
-function CMM:getKeepVal(index)
-	if index ~= nil then
-		return self.keepVal[index]
-	end
-	return self.keepVal
+function CMM:resetstoreOperation()
+	self.storeOperation = {}
 end
 
-function CMM:resetKeepVal()
-	self.keepVal = {}
-end
-
-function CMM:setKeepVal(value, index)
+function CMM:setstoreOperation(value, index)
 	if index == nil then
-		self.keepVal[#self.keepVal + 1] = value
+		self.storeOperation[#self.storeOperation + 1] = value
 		return
 	end
-	self.keepVal[index] = value
+	self.storeOperation[index] = value
+end
+
+function CMM:getstoreOperation(index)
+	if index ~= nil then
+		return self.storeOperation[index]
+	end
+	return self.storeOperation
+end
+
+function CMM:resetstoreTI()
+	self.storeTI = {}
+end
+
+function CMM:setstoreTI(value, index)
+	if index == nil then
+		self.storeTI[#self.storeTI + 1] = value
+		return
+	end
+	self.storeTI[index] = value
+end
+
+function CMM:getstoreTI(index)
+	if index ~= nil then
+		return self.storeTI[index]
+	end
+	return self.storeTI
 end
 
 function CMM:getStatistics(index)

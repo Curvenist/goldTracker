@@ -169,6 +169,20 @@ function DateM:checkLastCoDate(TrackerDate)
 end
 
 --WeekSegmentation allows us isolate the previous week data
+function DateM:CurrentWeekDays(timestamp, dayStart, nbDays, array)
+	nbDays, dayStart, array = nbDays or 7, dayStart or 3, array or {}
+	timestamp = timestamp or self:convertToDateType(self:timeChecker(date("%d%m%Y")))
+	local currentDay = tonumber(date("%w", timestamp))
+	if currentDay < dayStart then 
+		currentDay = nbDays + currentDay
+	end
+	for i = 1, (currentDay - dayStart) do
+	  array[i] = timestamp - (24 * 60 * 60)*i
+	end
+	return array
+end
+
+--WeekSegmentation allows us isolate the previous week data
 function DateM:WeekSegmentation(timestamp, dayStart, nbDays, array)
 	nbDays, dayStart, array = nbDays or 7, dayStart or 3, array or {}
 	timestamp = timestamp or self:convertToDateType(self:timeChecker(date("%d%m%Y")))
