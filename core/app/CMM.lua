@@ -82,7 +82,7 @@ function CMM:initTimeArrayInterval(val)
 end
 
 function CMM:popUpStaticReport()
-	local panel, incomeType = MainM.panel.side, self.options["incomeNature"]
+	local panel, incomeType = MainM.panel.mainElementAdvancedStatOp, self.options["incomeNature"]
 	-- first, we need to create statistics, so we need to take the incomeType, store it and sens it to the stat function to get the result
 	if panel ~= nil then
 		for k, v in pairs(Const.AdvancedStatOp) do
@@ -113,7 +113,7 @@ function CMM:popUpStaticReport()
 end
 
 function CMM:popUpDataCompared()
-	local panelCentral, incomeType = MainM.panel.central.fontStrings, self.options["incomeNature"]
+	local panelCentral, incomeType = MainM.panel.mainElementTrackerCurrent.fontStrings, self.options["incomeNature"]
 	if panelCentral ~= nil then
 		local result = {self.statDevi:rating(Tracker:find(incomeType), self:getstoreOperation(1)), 1}
 		local translate = self:translate(result, Tracker:find(incomeType), self:getstoreOperation(1))
@@ -124,11 +124,14 @@ function CMM:popUpDataCompared()
         panelCentral["%rating6"]:SetText(translate[1])
 
 		if #self:getstoreTI() < 1 then
+			self:actualWeekScope(TrackerDate)
+			self:setstoreTI(self.CurrentTI[incomeType], 1)
 			for i, j in pairs(self:getTimeArray()) do
 				self.HistoryTI:constr(self.data[self:getTimeArray(i)]) self.HistoryTI:find(incomeType)
 				self:setstoreTI(self.HistoryTI[incomeType], i)
 			end
 		end
+
 		result = self.statDevi:plainPerformance(self:getstoreTI())
         panelCentral["%sum7"]:SetText(Money:ConvertGold(result))
     end

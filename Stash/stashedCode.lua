@@ -6,7 +6,7 @@ function SCMM:popUpData(array)
 elseif self.options["statsMethod"] == 2 then
 		statCalcul = function(vals1, vals2) return {self.statDevi:plainPerformance({{vals1, vals2}}), 2} end
 	end
-	local panel = MainM.panel.side
+	local panel = MainM.panel.main
 	if panel ~= nil then
 		for key, value in pairs(panel) do
 			if self:getTimeArray(key) ~= nil then
@@ -40,7 +40,7 @@ elseif self.options["statsMethod"] == 2 then
 end
 
 -- for k = 1, OptInt:get("maxIterations") do
--- 	self.panel.side[k] = self:addPanelElementItem("side", Const.History, self:setPosition({"TOPLEFT", 2, (3/2), X, Y}), "Frame", textSize)
+-- 	self.panel.main[k] = self:addPanelElementItem("side", Const.History, self:setPosition({"TOPLEFT", 2, (3/2), X, Y}), "Frame", textSize)
 -- 	Y[1] = Y[1] - 20
 -- end
 

@@ -9,6 +9,15 @@ Const = {
 			{"Greet", "Bonjour %player, voici le récapitulatif de votre activité :"},
 			{"Performance", "Performance"},
 		},
+		MenuButtons = {
+			{"TrackerCurrent", "Gold Tracker"}, -- default
+			{"Options", "Configurations"},
+			{"AdvancedStatOp", "Récapitulatif"}
+			--{"graph", "Graphique"}
+		},
+		Options = {
+			{"isSquashing", "Regroupement des anciennes données"}
+		},
 		-- From here, we have labelling data, works well with MenuM.displayMenuElements, putting nothing in translation will result in having no translation
 		MenuItems = {
 			{"DailyRecap", "Résumé"}, -- afficher en plus : performance moyenne sur 7 jours, moyenne des gains sur 7 jours
@@ -34,15 +43,15 @@ Const = {
 			{"stat", nil}
 		},
 		AdvancedStatOp = { --this object should only allow arithmetic values in the end
-			{"%outfn:CMM:weekScope", "récapitulatif Hebdomadaire"}, -- our Week Scope
+			{"%outfn:CMM:weekScope", "Récapitulatif Hebdomadaire"}, -- our Week Scope
 			{"%fn:Stats:average", "Moyenne"},
 			{"%fn:Stats:plainPerformance", "Somme"},
 			{"%drawLine"},
-			{"%outfn:CMM:monthScope", "récapitulatif mensuel"}, -- in any case, our current Month scope
+			{"%outfn:CMM:monthScope", "Récapitulatif mensuel"}, -- in any case, our current Month scope
 			{"%fn:Stats:average", "Moyenne"},
 			{"%fn:Stats:plainPerformance", "Somme"},
 			{"%drawLine"},
-			{"%outfn:CMM:monthPrevScope", "rappel de récapitulatif mensuel"}, -- this is for checking case we have first week of the month, we get the previous one!
+			{"%outfn:CMM:monthPrevScope", "Rappel de récapitulatif mensuel"}, -- this is for checking case we have first week of the month, we get the previous one!
 			{"%fn:Stats:average", "Moyenne"},
 			{"%fn:Stats:plainPerformance", "Somme"}
 		},

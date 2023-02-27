@@ -4,7 +4,7 @@ $file = "goldTracker"
 $input_file = $file + ".toc"
 $output_file = $file + ".txt"
 $core = "core"
-$exclusion = "dataManagement.lua, graphM.lua"
+$exclusion = @("dataManagement.lua", "graphM.lua")
 
 $init = 
 "## Interface: 100005

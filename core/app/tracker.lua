@@ -3,10 +3,10 @@ NewCMM = CMM:new()
 
 function Tracker:popUpData()
 	Tracker:find("netEarning")
-    if MainM.panel.central.fontStrings ~= nil then
+    if MainM.panel.mainElementTrackerCurrent.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerCurrent) do v = v[1]
             if GeneralM:isNotCommand(v) then
-        	    MainM.panel.central.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
+        	    MainM.panel.mainElementTrackerCurrent.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
             end
 		end
     end
