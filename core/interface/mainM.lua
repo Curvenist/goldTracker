@@ -75,7 +75,7 @@ function MainM:main()
 			self.panel.texture = self:addTexture()
 			--self.panel:Hide()
 			self.panel.buttonClose = self:appendCloseBox(VProperties.textSize)
-			self.panel.buttonResize = self:appendResizeBorder()
+			self.panel.buttonResize = self:appendResizeBorder(VProperties.textSize)
 
 			--@todo here gonna add buttons for options
 			VProperties:marges("menuBox")
@@ -90,9 +90,9 @@ function MainM:main()
 			end
 
 			VProperties:marges("mainBox")
-			X, Y = {150, 0, 100}, {0, -20, 0}
+			X, Y = {100, 0, 100}, {0, -20, 0}
 			self.panel.main = self:addPanelElementItem("menu", nil, self:setPosition({"TOPLEFT", VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame")
-			-- we're loading all nodes but we will hide them all EXCEPT TrackerCurrent
+
 			X, Y = {VProperties.padding.w + X[1], 0 + X[2], VProperties.nextItemPos.w + X[3]}, {0 + Y[2], Y[2], Y[3]}
 			for k, v in pairs(Const.MenuButtons) do
 				obj = Const.MenuButtons
@@ -179,22 +179,26 @@ function MainM:appendCloseBox(textSpacing)
 	local f = CreateFrame("Button", nil, self.panel)
 	f:SetSize(textSpacing[2], textSpacing[2])
 	f:SetPoint("TOPRIGHT", 0, 0)
-
+	f:SetAlpha(0.2)
 	local t = f:CreateFontString(nil, "OVERLAY")
 	t:SetFont(OptInt:get("font"), textSpacing[2] or 11)
 	t:SetPoint("TOP", 0, 0)
 	t:SetText("x")
 	
+	
 	f.fontString = t
 	
+	f:SetScript("OnEnter", function(self) self:SetAlpha(1) end)
+    f:SetScript("OnLeave", function(self) self:SetAlpha(0.2) end)
+
 	f:SetScript("OnClick", function () self.panel:Hide(); self.isShown = false; return end) 
 	return f
 end
 
-function MainM:appendResizeBorder()
+function MainM:appendResizeBorder(textSpacing)
 	local b = CreateFrame("Button", nil, self.panel)
 	b:EnableMouse(true)
-	b:SetSize(16,16)
+	b:SetSize(textSpacing[2], textSpacing[2])
 	b:SetPoint("BOTTOMRIGHT")
 
 	b:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
@@ -226,15 +230,18 @@ function MainM:addPanelSingleButton(name, item, position, textSpacing, parentFra
 	local f = CreateFrame("Button", name, parentFrame)
 	f:SetPoint(position[1], X[1], Y[1])
 	f:SetSize(100, 11)
+	f:SetAlpha(0.2)
 	
 	local t = f:CreateFontString(nil, "OVERLAY")
 	t:SetFont(OptInt:get("font"), textSpacing[2] or 11)
 	t:SetPoint(position[1], X[1])
 	t:SetText(item[2])
+	
+	f:SetScript("OnEnter", function(self) self:SetAlpha(1) end)
+    f:SetScript("OnLeave", function(self) self:SetAlpha(0.2) end)
 	f:SetScript("OnClick", function () IntFns:getFn(item[1])() end) 
 	f.fontString = t
 
-	
 	return f
 end
 
