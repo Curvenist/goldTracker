@@ -64,7 +64,7 @@ function Money:convertGreatVals(money, firstbase, base, decimal)
 end
 
 function Money:separator(money, base)
-    local logarithm =math.floor(Money:logarithm(money, 10))
+    local logarithm = math.floor(Money:logarithm(money, 10))
     local maximal = logarithm / base^2
     local common = (logarithm / base) % base
 	local separator = ""

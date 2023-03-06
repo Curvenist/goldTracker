@@ -5,6 +5,8 @@ IntFns = {
         --{"graph", "Graphique"}
 }
 
+
 function IntFns:getFn(index)
     return self[index]
 end
+

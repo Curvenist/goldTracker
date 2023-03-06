@@ -51,15 +51,15 @@ end
 function TrackerInstance:catchupDaily(date)
 	date = date or TrackerDate
 	local lastDate = DateM:checkLastCoDate(date)
-    if date ~= lastDate and customMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netValueD! made also sure that it's diff day
-        self.netValueD = self.dailyMoney - customMoney[lastDate].currentMoney
+    if date ~= lastDate and GTMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netValueD! made also sure that it's diff day
+        self.netValueD = self.dailyMoney - GTMoney[lastDate].currentMoney
 	end
 end
 
 function TrackerInstance:catchup(dayDate)
 	dayDate = dayDate or TrackerDate
-    if self.currentMoney ~= customMoney[dayDate].currentMoney then
-        self.netValue = self.netValue + self.currentMoney - customMoney[dayDate].currentMoney
+    if self.currentMoney ~= GTMoney[dayDate].currentMoney then
+        self.netValue = self.netValue + self.currentMoney - GTMoney[dayDate].currentMoney
     end
 	
 end

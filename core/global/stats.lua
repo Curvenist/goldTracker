@@ -168,7 +168,7 @@ function Stats:rating(numerator, denominator, mult)
 	self:incrementNum(self:getCalculation(1))
 	self:incrementDenom(self:getCalculation(2))
 
-	if self:getNum() == 0 or self:getDenom() == 0 then 
+	if self:getDenom() == 0 then 
 		return 0
 	end
 

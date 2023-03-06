@@ -43,7 +43,7 @@ end
 function VProperties:update()
 	self.container = {w = MainM:getWidth(), h = MainM:getHeight()}
 	self.menuBox = {w = MainM:getWidth() / 4, h = MainM:getHeight()}
-	self.mainBox = {w = (MainM:getWidth() - MainM:getWidth() / 1.2), h = MainM:getHeight()}
+	self.mainBox = {w = (MainM:getWidth() - MainM:getWidth() / 1.5), h = MainM:getHeight()}
 	self.padding = {w = MainM:getWidth() * 0.05, h = MainM:getHeight() * -0.05} -- margins are 5% of the max size
 	self.textSize = {false, MainM.textSize(MainM.p.h)}
 end
@@ -90,15 +90,27 @@ function MainM:main()
 			end
 
 			VProperties:marges("mainBox")
-			X, Y = {100, 0, 100}, {0, -20, 0}
+			X, Y = {100, 0, 25}, {0, -20, 0}
 			self.panel.main = self:addPanelElementItem("menu", nil, self:setPosition({"TOPLEFT", VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame")
 
 			X, Y = {VProperties.padding.w + X[1], 0 + X[2], VProperties.nextItemPos.w + X[3]}, {0 + Y[2], Y[2], Y[3]}
 			for k, v in pairs(Const.MenuButtons) do
 				obj = Const.MenuButtons
-				self.panel["mainElement" .. obj[k][1]] = self:addPanelElementItem("mainElement", Const[obj[k][1]], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", VProperties.textSize, {"panel", "main"})
-			if k ~= 1 then
-					self.panel["mainElement" .. obj[k][1]]:Hide()
+				local item = Const[obj[k][1]]
+				local name = "mainElement" .. obj[k][1]
+				if obj[k][1] == "Options" then
+					local keep = Y[1]
+					for k2, v2 in pairs(Const[obj[k][1]]) do
+						self.panel[name .. k2] = self:addPanelElementSingleItem(name .. k2, item[k2], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), item[k2][3], VProperties.textSize, {"panel", "main"})
+						Y[1] = Y[1] + Y[2]
+						self.panel[name .. k2]:Hide()
+					end
+					Y[1] = keep
+				else
+					self.panel[name] = self:addPanelElementItem(name, item, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", VProperties.textSize, {"panel", "main"})
+				end
+				if k ~= 1 and obj[k][1] ~= "Options" then
+					self.panel[name]:Hide()
 				end
 			end
         end
@@ -110,9 +122,21 @@ function MainM:MenuButtonNavAction(switch)
 	switch = switch or obj[1][1]
 	for k, v in pairs(obj) do
 		if obj[k][1] == switch then 
+			if obj[k][1] == "Options" then
+				for k2 in pairs(Const[obj[k][1]]) do
+					self.panel["mainElement" .. obj[k][1] .. k2]:Show()
+				end
+			else
 			self.panel["mainElement" .. obj[k][1]]:Show()
+			end
 		else 
-			self.panel["mainElement" .. obj[k][1]]:Hide() 
+			if obj[k][1] == "Options" then
+				for k2 in pairs(Const[obj[k][1]]) do
+					self.panel["mainElement" .. obj[k][1] .. k2]:Hide()
+				end
+			else
+			self.panel["mainElement" .. obj[k][1]]:Hide()
+			end
 		end
 	end
 end
@@ -198,7 +222,7 @@ end
 function MainM:appendResizeBorder(textSpacing)
 	local b = CreateFrame("Button", nil, self.panel)
 	b:EnableMouse(true)
-	b:SetSize(textSpacing[2], textSpacing[2])
+	b:SetSize(textSpacing[2], 20)
 	b:SetPoint("BOTTOMRIGHT")
 
 	b:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
@@ -220,6 +244,61 @@ function MainM:addPanelElementItem(name, item, position, elemtype, textSpacing, 
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
 	self:displayMenuElements(position[4], position[5], item, f, textSpacing, name)
+	return f
+end
+
+function MainM:addPanelElementSingleItem(name, item, position, elemtype, textSpacing, parentFrame)
+	parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
+	local X, Y = position[4], position[5]
+	local f, saved = nil, nil
+	if GTConfigs[item[1]] ~= nil then
+		saved = GTConfigs[item[1]]
+	end
+	if elemtype == "EditBox" then
+		f = CreateFrame("EditBox", nil, parentFrame, "InputBoxTemplate")
+		f:SetFont(OptInt:get("font"), textSpacing[2] or 11, "")
+		f:SetNumeric(true)
+		f:SetNumber(saved ~= nil and saved or item[4])
+		f:SetFrameStrata("LOW")
+		f:SetSize(15, 15)
+		f:SetScript("OnEditFocusLost", function()
+			GTConfigs[item[1]] = f:GetNumber()
+		end)
+	elseif elemtype == "CheckButton" then
+		f = CreateFrame("CheckButton", name, parentFrame, "ChatConfigCheckButtonTemplate")
+		if saved ~= nil then item[4] = saved end
+		f:SetChecked(saved ~= nil and saved)
+		f:SetSize(15, 15)
+		f:SetScript("OnClick", function()
+			GTConfigs[item[1]] = f:GetChecked()
+		end)
+	elseif elemtype == "label" then
+		f = CreateFrame("Frame", name, parentFrame)
+		f:SetSize(position[2], position[3])
+	elseif elemtype == "dropdown" then
+		f = CreateFrame("Frame", name, parentFrame, "UIDropDownMenuTemplate")
+		f:SetSize(position[2], position[3])
+		UIDropDownMenu_SetWidth(f, position[2] / 2)
+		UIDropDownMenu_Initialize(f, function(frame, level)
+			info = UIDropDownMenu_CreateInfo()
+			for k, v in pairs(item[5][1]) do
+				info.text, info.value, info.checked = v, k, false
+				info.menuList = v
+				info.func = function()
+					UIDropDownMenu_SetSelectedValue(f, k)
+					GTConfigs[item[1]] = UIDropDownMenu_GetSelectedValue(f, k)
+				end
+				UIDropDownMenu_AddButton(info)
+			end
+		end)
+		UIDropDownMenu_SetSelectedValue(f, saved ~= nil and saved or item[4])
+	end
+	f:SetPoint(position[1], X[1], Y[1])
+	local l = f:CreateFontString(nil, "OVERLAY")
+	l:SetFont(OptInt:get("font"), textSpacing[2] or 11)
+	l:SetPoint(position[1], elemtype == "label" and 0 or X[1], 0)
+	l:SetText(item[2][1])
+
 	return f
 end
 
@@ -301,7 +380,6 @@ end
 function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
     local X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
     frame = frame or self.panel
-	elemtype = elemtype or nil
     frame.fontStrings = {}
 	frame.elems = {}
 
@@ -318,7 +396,6 @@ function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
 				
 				frame.fontStrings[key .. increment .. "Text"] = linetext
 			end
-
 				local linevalue = frame:CreateFontString(nil, "OVERLAY")
 				if textSpacing[1] then 
 					linevalue:SetSpacing(math.abs(Y[2]))
@@ -327,11 +404,6 @@ function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
 				linevalue:SetJustifyH("left")
 				linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
 				frame.fontStrings[key .. increment] = linevalue
-				
-			if elemtype == "Button" then
-				 
-			end 
-				
 		end
 		X[1] = X[1] + X[2]
         Y[1] = Y[1] + Y[2]
@@ -359,7 +431,7 @@ function MainM:elementCommand(frame, value, X, Y)
 			local width = (VProperties.mainBox.w)
 			l:SetColorTexture(1, 1, 1, 1)
 			l:SetStartPoint("TOP", X[1], Y[1])
-			l:SetEndPoint("TOP", X[1] + (width * 0.5), Y[1])
+			l:SetEndPoint("TOP", X[1] + (width * 0.8), Y[1])
 			l:SetThickness(1)
 		 end) and l
 end

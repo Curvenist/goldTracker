@@ -1,14 +1,14 @@
-OptCMM = {
+OptGTM = {
 	incomeNature = 1,
 	statsMethod = 1,
 	comparison = 1
 }
 
-function OptCMM:set(property, value)
+function OptGTM:set(property, value)
 	self[property] = value
 end
 
-function OptCMM:get(property)
+function OptGTM:get(property)
 	if property ~= nil then
 		return self[property]
 	end

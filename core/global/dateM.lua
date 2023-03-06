@@ -26,15 +26,15 @@ end
 
 
 function DateM:ConversionAllDates()
-	for k, v in pairs(customMoney) do
-		local elems = customMoney[k]
+	for k, v in pairs(GTMoney) do
+		local elems = GTMoney[k]
 		local key = self:convertToDateType(k)
-		customMoney[k] = nil -- set to nil the entry whith a date that is not a timestamp
-		customMoney[key] = elems
+		GTMoney[k] = nil -- set to nil the entry whith a date that is not a timestamp
+		GTMoney[key] = elems
 	end
-	for k, v in pairs(customMoney) do
+	for k, v in pairs(GTMoney) do
 		if type(k) == "string" then
-			customMoney[k] = nil
+			GTMoney[k] = nil
 		end
 	end
 end
@@ -149,7 +149,7 @@ end
 function DateM:checkLastCoDate(TrackerDate)
     local dateTimestamp = DateM:convertToDateType(TrackerDate)
     local originDiff, comparedDiff = nil, nil
-    for k,v in pairs(customMoney) do
+    for k,v in pairs(GTMoney) do
         if originDiff == nil and k ~= TrackerDate then
             originDiff = {k, math.floor((dateTimestamp - DateM:convertToDateType(k)))} -- seconds, math gives whole day
         elseif comparedDiff == nil and k ~= TrackerDate then
@@ -218,17 +218,20 @@ function DateM:MonthSegmentation(timestamp, dayStart, nbDays, array)
 
 	local checkM, check = tonumber(date("%m", timestamp)), true
 	local starting, ending = 1, 7
-
+	currentMonth = tonumber(date("%m", difftime(timestamp, (24 * 60 * 60)*ending))) -- positionning ourselves in the wednesday of the preious week
 	while check == true do
 		checkM = tonumber(date("%m", difftime(timestamp, (24 * 60 * 60)*ending)))
-		if checkM ~= currentMonth then 
-		  check = false
+		
+		if checkM == currentMonth then 
+			for i = starting, ending do 
+				array[i] = difftime(timestamp, (24 * 60 * 60)*i)
+			end
+		else
+			check = false  
 		end
-		for i = starting, ending do 
-		  array[i] = difftime(timestamp, (24 * 60 * 60)*i)
-		end
+		
 		starting = ending
-		ending = ending + ending
+		ending = 7 + ending
 	  end
 
 	return array

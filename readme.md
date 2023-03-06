@@ -39,7 +39,7 @@ Exposes a function that records data and chart of money income and spending
 
 ## Stash code
 
-customMoney = {
+GTMoney = {
 	[1673478000] = {
 		["dailyMoney"] = 15043508958,
 		["dailyCatch"] = true,
@@ -113,7 +113,7 @@ customMoney = {
 	},
 }
 dateArray = {}
-for k, v in pairs(customMoney) do
+for k, v in pairs(GTMoney) do
     table.insert(dateArray, k)
 end
 table.sort(dateArray, function(a, b) return a > b end)

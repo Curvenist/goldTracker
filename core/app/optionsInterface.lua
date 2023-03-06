@@ -1,5 +1,15 @@
 OptInt = {
-    maxIterations = 7,
+    GTmaxIterations = 7,
+    GTstartingDay = 3,
+    GTmaxIterationsLimit = 30,
+    GTupdateShow = true,
+    GTupdateTimer = 5,
+    GTupdateShowType = 1, -- 0 is normal window, 1 is reduced data
+    GTsquashData = true,
+    GTsquashDataType = 1,
+    GTsquashDataTrigger = 30, -- days
+    GTremoveOldData = 120, --days
+
     switch = {
         days = true,
         week = false,
@@ -9,6 +19,7 @@ OptInt = {
         average = true,
         deviation = false
     },
+
     font = "Fonts\\ARIALN.TTF",
 }
 

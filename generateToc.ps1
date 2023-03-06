@@ -11,7 +11,7 @@ $init =
 ## Title: goldTracker
 ## Author: Fixer
 ## Version: 1.0
-## SavedVariablesPerCharacter: customMoney
+## SavedVariablesPerCharacter: GTMoney
 
 libs/LibDBIcon-1.0/embeds.xml
 libs/LibDBIcon-1.0/LibDBIcon-1.0/lib.xml

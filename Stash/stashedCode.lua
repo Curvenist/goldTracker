@@ -1,4 +1,4 @@
-function SCMM:popUpData(array)
+function SGTM:popUpData(array)
 	local instance = Tracker
 	local statCalcul, incomeType = nil, self.options["incomeNature"]
 	if self.options["statsMethod"] == 1 then
@@ -11,10 +11,10 @@ elseif self.options["statsMethod"] == 2 then
 		for key, value in pairs(panel) do
 			if self:getTimeArray(key) ~= nil then
 				local d, dd = self:getTimeArray(key), nil
-				if key < #panel and OptCMM:get("comparison") == 2 then 
+				if key < #panel and OptGTM:get("comparison") == 2 then 
 					dd = self:getTimeArray(key + 1)
 					instance = self.data[dd]
-				elseif OptCMM:get("comparison") == 2 then
+				elseif OptGTM:get("comparison") == 2 then
 					instance = self.data[d]
 				end
 				self.CurrentTI:constr(instance) self.CurrentTI:find(incomeType)

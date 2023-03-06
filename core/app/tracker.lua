@@ -1,5 +1,6 @@
 Tracker = TrackerInstance:new()
-NewCMM = CMM:new()
+NewGTM = GTM:new()
+NewConfig = Config:new()
 
 function Tracker:popUpData()
 	Tracker:find("netEarning")
@@ -13,11 +14,14 @@ function Tracker:popUpData()
 end
 
 function Tracker:main() -- fonction d'entrée, login started
-    if customMoney == nil then -- fresh install
-        customMoney = {}
-    elseif customMoney[TrackerDate] == nil then
-        customMoney[TrackerDate] = Tracker
+    if GTMoney == nil then -- fresh install
+        GTMoney = {}
+    elseif GTMoney[TrackerDate] == nil then
+        GTMoney[TrackerDate] = Tracker
 	end
+    if GTConfigs == nil then
+        GTConfigs = OptInt
+    end
     self:frameAdvisor()
 end
 
@@ -35,9 +39,9 @@ function Tracker:loginEvent()
 		--DateMethods:testConversionAllDates()
 		self:constr()
 		self.currentMoney = self:GetMoney()
-        if customMoney[TrackerDate] ~= nil then --loading existing data!
-			for k, v in pairs(customMoney[TrackerDate]) do
-				self[k] = customMoney[TrackerDate][k]
+        if GTMoney[TrackerDate] ~= nil then --loading existing data!
+			for k, v in pairs(GTMoney[TrackerDate]) do
+				self[k] = GTMoney[TrackerDate][k]
 			end
             self:catchup()
         else --a new day
@@ -51,9 +55,10 @@ function Tracker:loginEvent()
 		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
 
         self:popUpData()
-        NewCMM:main(customMoney)
-        NewCMM:popUpStaticReport()
-        NewCMM:popUpDataCompared()
+        NewGTM:main(GTMoney)
+        NewConfig:popUpData()
+        NewGTM:popUpStaticReport()
+        NewGTM:popUpDataCompared()
     end)
 end
 
@@ -68,7 +73,7 @@ function Tracker:RecordMoney()
         self.currentMoney = self:GetMoney() --updating Our Current money
 		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
         self:popUpData()
-        NewCMM:popUpDataCompared()
+        NewGTM:popUpDataCompared()
     end)
 end
 
@@ -78,7 +83,8 @@ function Tracker:logoutEvent()
     local f = CreateFrame("Frame")
     f:RegisterEvent("PLAYER_LOGOUT")
     f:SetScript("OnEvent", function()
-        customMoney[TrackerDate] = self
+        GTConfigs = GTConfigs
+        GTMoney[TrackerDate] = self
     end)
    
 end

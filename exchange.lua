@@ -14,7 +14,7 @@ Exchange = {
 function Exchange:checkLastCoDate(date)
     local d = GlobalMethods:timeChecker(date)
     local originDiff, comparedDiff = nil, nil
-    for k,v in pairs(customMoney) do
+    for k,v in pairs(GTMoney) do
         if originDiff == nil and k ~= self.date then
             originDiff = {k, math.floor((d - GlobalMethods:timeChecker(k)) / (24 * 60 * 60))} -- seconds, math gives whole day
         elseif comparedDiff == nil and k ~= self.date then
@@ -37,25 +37,25 @@ end
 -- 24/12/2022 dang it, forgot to add income and spending to calculate netValueD
 function Exchange:catchupDaily()
     local lastDate = self:checkLastCoDate(self.date)
-    if self.date ~= lastDate and customMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netDailyValue! made also sure that it's diff day
-        self.netValueD = self.dailyMoney - self.income + self.spending - customMoney[lastDate].currentMoney
+    if self.date ~= lastDate and GTMoney[lastDate].currentMoney ~= self.dailyMoney then -- difference between two values, we need to catchup the netDailyValue! made also sure that it's diff day
+        self.netValueD = self.dailyMoney - self.income + self.spending - GTMoney[lastDate].currentMoney
     end
 
 end
 
 -- 24/12/2022 dang it, forgot to add income and spending to calculate netValue
 function Exchange:catchup()
-    if self.currentMoney ~= customMoney[self.date].currentMoney then
-        self.netValue = self.netValue + (self.currentMoney - self.income + self.spending - customMoney[self.date].currentMoney)
+    if self.currentMoney ~= GTMoney[self.date].currentMoney then
+        self.netValue = self.netValue + (self.currentMoney - self.income + self.spending - GTMoney[self.date].currentMoney)
     end
 end
 
 function Exchange:main() -- fonction d'entrée, login started
     self.date = date("%d%m%Y")
-    if customMoney == nil then -- fresh install
-        customMoney = {}
-    elseif customMoney[self.date] == nil then
-        customMoney[self.date] = Exchange
+    if GTMoney == nil then -- fresh install
+        GTMoney = {}
+    elseif GTMoney[self.date] == nil then
+        GTMoney[self.date] = Exchange
     end
     
     self:frameAdvisor()
@@ -75,13 +75,13 @@ function Exchange:loginEvent()
         self.currentMoney = self:GetMoney()
         
         
-        if customMoney[self.date] ~= nil then --loading existing data!
-            self.dailyMoney = customMoney[self.date].dailyMoney
-            self.income = customMoney[self.date].income
-            self.spending = customMoney[self.date].spending
-            self.dailyCatch = customMoney[self.date].dailyCatch
-            self.netValue = customMoney[self.date].netValue
-            self.netValueD = customMoney[self.date].netValueD
+        if GTMoney[self.date] ~= nil then --loading existing data!
+            self.dailyMoney = GTMoney[self.date].dailyMoney
+            self.income = GTMoney[self.date].income
+            self.spending = GTMoney[self.date].spending
+            self.dailyCatch = GTMoney[self.date].dailyCatch
+            self.netValue = GTMoney[self.date].netValue
+            self.netValueD = GTMoney[self.date].netValueD
             self:catchup()
         else --a new day
             self.dailyMoney = self:GetMoney()
@@ -118,7 +118,7 @@ function Exchange:logoutEvent()
     local f = CreateFrame("Frame")
     f:RegisterEvent("PLAYER_LOGOUT")
     f:SetScript("OnEvent", function()
-        customMoney[self.date] = Exchange
+        GTMoney[self.date] = Exchange
     end)
    
 end

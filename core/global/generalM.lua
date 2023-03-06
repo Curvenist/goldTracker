@@ -9,7 +9,8 @@ GeneralM = {
 		"%%label", -- is only a label
 		"%%outfn",
 		"%%fn:" -- calling a function
-	}
+	},
+
 }
 
 function GeneralM:tableContains(tab, val)
@@ -61,6 +62,7 @@ function GeneralM:analyseCommand(value)
 	return false
 end
 
+--outCommands are generally used to help doing commands outside of a single processor analyseCommand, meaning you want to load some data before working on it in analyseCommand
 function GeneralM:analyseOutCommand(value)
 	local i, array = 1, {}
 	if string.find(value, "^%%outfn") then
@@ -81,4 +83,32 @@ function GeneralM:stringifyArg(arg)
 		return tostring(arg)
 	end
 	return tostring(arg)
+end
+
+
+--so here we go, this is the big boy function replacing values inside a text, lets go!
+function GeneralM:replaceValues(text, value)
+	local findReg = 
+	function (text)
+		local i, array = 1, {}
+		if string.find(text, "%%value") then
+			for w in string.gmatch(text, "%%value%d*") do
+			array[i] = w
+			i = i + 1
+			end
+		return array
+		end
+		return {}
+	end
+	local replaceReg = 
+	function (text, value, i)
+		return string.gsub(text, "%%value%d*", value, i)
+	end
+
+	for k, v in pairs(findReg(text)) do
+		if value[k] ~= nil then
+		text = replaceReg(text, value[k], 1)
+		end
+	end
+	return text
 end
