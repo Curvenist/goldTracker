@@ -39,6 +39,13 @@ Const = {
 			{"Provisionning", "Budget", "Budget"}, -- bouton permettant de créer un budget de dépense à alluer (chiffre + temporel)
 			{"Aim", "Ciblée", "Targeted"} -- bouton permettant de créer un performance cible à réaliser (chiffre + temporel)
 		},
+		TrackerReduced = {
+			{"income", "Revenu", "Income"},
+			{"spending", "Dépense", "Spending"},
+			{"%drawLine"},
+			{"netEarning", "Performance", "Performance"},
+			{"%rating", "Perf / moyenne n-1", "Perf / avg n-1"},
+		},
         TrackerCurrent = { 
             {"currentMoney", "Epargne", "Savings"},
 			{"income", "Revenu", "Income"},

@@ -57,23 +57,23 @@ elseif self.options["statsMethod"] == 2 then
 end
 
 function GTM:actualWeekScope(TrackerDate)
-	self:setTimeArray(DateM:CurrentWeekDays(TrackerDate, 3, 7))
+	self:setTimeArray(DateM:CurrentWeekDays(TrackerDate, GTConfigs["GTstartingDay"], GTConfigs["GTmaxIterations"]))
 	DateM:datePicker(self:getTimeArray(), {}, self.data)
 end
 
 function GTM:weekScope(TrackerDate)
-	self:setTimeArray(DateM:WeekSegmentation(TrackerDate, 3, 7))
+	self:setTimeArray(DateM:WeekSegmentation(TrackerDate, GTConfigs["GTstartingDay"], GTConfigs["GTmaxIterations"]))
 	DateM:datePicker(self:getTimeArray(), {}, self.data)
 end
 
 function GTM:monthScope(TrackerDate)
-	self:setTimeArray(DateM:MonthSegmentation(TrackerDate, 3, 7))
+	self:setTimeArray(DateM:MonthSegmentation(TrackerDate, GTConfigs["GTstartingDay"], GTConfigs["GTmaxIterations"]))
 	DateM:datePicker(self:getTimeArray(), {}, self.data)
 end
 
 function GTM:monthPrevScope(TrackerDate)
 	local timestamp = TrackerDate - (24 * 60 * 60)*(7)
-	self:setTimeArray(DateM:MonthSegmentation(timestamp, 3, 7))
+	self:setTimeArray(DateM:MonthSegmentation(timestamp, GTConfigs["GTstartingDay"], GTConfigs["GTmaxIterations"]))
 	DateM:datePicker(self:getTimeArray(), {}, self.data)
 end
 

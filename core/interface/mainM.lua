@@ -2,7 +2,7 @@ MainM = {
     options = true,
     optVal = nil,
     panel = nil,
-	isShown = true,
+	isShown = {container = true, reduced = true},
 
 	p = {
 		w = 500,
@@ -46,6 +46,7 @@ function VProperties:update()
 	self.mainBox = {w = (MainM:getWidth() - MainM:getWidth() / 1.5), h = MainM:getHeight()}
 	self.padding = {w = MainM:getWidth() * 0.05, h = MainM:getHeight() * -0.05} -- margins are 5% of the max size
 	self.textSize = {false, MainM.textSize(MainM.p.h)}
+	self.reduced = {w = MainM:getWidth() / 3, h = MainM:getHeight() / 2}
 end
 
 function VProperties:marges(index)
@@ -63,6 +64,15 @@ function MainM:getWidth(Width)
 	return self.p.w
 end
 
+function MainM:dynamicArrayExtent(obj, frame)
+    GTFr = frame or self
+	local arr = ""
+	for k, v in pairs(obj) do
+		arr = arr .. "[\"" .. v .. "\"]"
+	end
+	return loadstring("return GTFr" .. arr)()
+end
+
 function MainM:main()
     local f = CreateFrame("Frame")
     f:RegisterEvent("ADDON_LOADED")
@@ -71,11 +81,19 @@ function MainM:main()
 			VProperties:update()
 			self:setupOverlay(addonname) --library
 
-			self.panel = self:setupFrame("Bank Account")
-			self.panel.texture = self:addTexture()
+			self.minPanel = self:setupFrame("reduced", "reduced")
+			self.minPanel.texture = self:addTexture(self.minPanel)
+			self.minPanel.buttonResize = self:appendResizeBorder(VProperties.textSize, {"minPanel"})
+			VProperties:marges("mainBox")
+			X, Y = {0, 0, 100}, {0, -20, 0}
+			self.minPanel.main = self:addPanelElementItem("reducedData", Const.TrackerReduced, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", VProperties.textSize, {"minPanel"})
+			self.minPanel:Hide()
+
+			self.panel = self:setupFrame("main", "container")
+			self.panel.texture = self:addTexture(self.panel)
 			--self.panel:Hide()
 			self.panel.buttonClose = self:appendCloseBox(VProperties.textSize)
-			self.panel.buttonResize = self:appendResizeBorder(VProperties.textSize)
+			self.panel.buttonResize = self:appendResizeBorder(VProperties.textSize, {"panel"})
 
 			--@todo here gonna add buttons for options
 			VProperties:marges("menuBox")
@@ -146,8 +164,8 @@ function MainM:setupOverlay(addonname)
 		text = addonname,		
 		icon = "Interface\\icons\\inv_misc_bag_01",	
 		OnClick = function(s, btn)
-					if self.isShown then self.panel:Hide(); self.isShown = false
-					elseif not self.isShown then self.panel:Show() self.isShown = true end
+					if self.isShown.container then self.panel:Hide(); self.isShown.container = false
+					elseif not self.isShown.container then self.panel:Show() self.isShown.container = true end
 					return
 				end
 		})
@@ -157,25 +175,28 @@ end
 
 --@todo we should add options in order to change size, colors etc!
 
-function MainM:setupFrame(name)
-	local panel = CreateFrame("Frame", "main")
-	panel.name = name
+function MainM:setupFrame(name, obj)
+	local width, height = VProperties[obj].w, VProperties[obj].h
+	local panel = CreateFrame("Frame", name)
 	panel:SetFrameStrata("BACKGROUND")
 	panel:SetPoint("CENTER")
-	panel:SetWidth(self:getWidth())
-	panel:SetHeight(self:getHeight())
+	panel:SetWidth(width)
+	panel:SetHeight(height)
 	panel:EnableKeyboard(true)
 	panel:EnableMouse(true)
 	panel:SetPropagateKeyboardInput(true)
 	panel:SetMovable(true)
 	panel:SetResizable(true)
-	panel:SetResizeBounds(self.c.DivW(self, 2), self.c.DivH(self, 2), self.c.MulW(self, 2), self.c.MulH(self, 2))
+	panel:SetResizeBounds(width / 2, height / 2, width * 2, height * 2)
 	panel:SetUserPlaced(true)
 	panel:RegisterForDrag("LeftButton")
-	panel:SetScript("OnKeyDown", function (arg, key) 
+	if obj == "container" then
+		panel:SetScript("OnKeyDown", function (arg, key) 
 		if key == "ESCAPE" then
-			self.panel:Hide(); self.isShown = false;
-		end end)
+			panel:Hide(); self.isShown[obj] = false;
+		end 
+		end)
+	end
 	panel:SetScript("OnDragStart", function (arg, key) 
 		arg:StartMoving()
 		end)
@@ -186,20 +207,21 @@ function MainM:setupFrame(name)
 		VProperties:update()
 		end)
 	panel:SetPoint("CENTER", 0, 0)
-
-	
 	return panel
 end
 
 
-function MainM:addTexture()
-	local t = self.panel:CreateTexture(nil, "BACKGROUND")
+function MainM:addTexture(frame)
+	frame = frame or self.panel
+	local t = frame:CreateTexture(nil, "BACKGROUND")
 	t:SetAllPoints()
 	t:SetColorTexture(0, 0, 0, 0.5)
 	return t
 end
 
-function MainM:appendCloseBox(textSpacing)
+function MainM:appendCloseBox(textSpacing, frame)
+	frame = (frame ~= nil and #frame >= 1 and self:dynamicArrayExtent(frame, self)) or self.panel
+	--frame = (frame ~= nil and #frame == 1 and self[frame[1]]) or self.panel
 	local f = CreateFrame("Button", nil, self.panel)
 	f:SetSize(textSpacing[2], textSpacing[2])
 	f:SetPoint("TOPRIGHT", 0, 0)
@@ -215,12 +237,14 @@ function MainM:appendCloseBox(textSpacing)
 	f:SetScript("OnEnter", function(self) self:SetAlpha(1) end)
     f:SetScript("OnLeave", function(self) self:SetAlpha(0.2) end)
 
-	f:SetScript("OnClick", function () self.panel:Hide(); self.isShown = false; return end) 
+	f:SetScript("OnClick", function () self.panel:Hide(); self.isShown.container = false; return end) 
 	return f
 end
 
-function MainM:appendResizeBorder(textSpacing)
-	local b = CreateFrame("Button", nil, self.panel)
+function MainM:appendResizeBorder(textSpacing, frame)
+	frame = (frame ~= nil and #frame >= 1 and self:dynamicArrayExtent(frame, self)) or self.panel
+	--frame = (frame ~= nil and #frame == 1 and self[frame[1]]) or self.panel
+	local b = CreateFrame("Button", nil, frame)
 	b:EnableMouse(true)
 	b:SetSize(textSpacing[2], 20)
 	b:SetPoint("BOTTOMRIGHT")
@@ -239,7 +263,8 @@ function MainM:appendResizeBorder(textSpacing)
 end
 
 function MainM:addPanelElementItem(name, item, position, elemtype, textSpacing, parentFrame)
-	parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
+	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
+	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
 	local f = CreateFrame("Frame", name, parentFrame)
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
@@ -248,7 +273,8 @@ function MainM:addPanelElementItem(name, item, position, elemtype, textSpacing, 
 end
 
 function MainM:addPanelElementSingleItem(name, item, position, elemtype, textSpacing, parentFrame)
-	parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
+	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
+	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
 	local X, Y = position[4], position[5]
 	local f, saved = nil, nil
 	if GTConfigs[item[1]] ~= nil then
@@ -303,7 +329,8 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, textSpa
 end
 
 function MainM:addPanelSingleButton(name, item, position, textSpacing, parentFrame)
-	parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
+	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
+	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
 	local X, Y = position[4], position[5]
 
 	local f = CreateFrame("Button", name, parentFrame)

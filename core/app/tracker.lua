@@ -11,6 +11,13 @@ function Tracker:popUpData()
             end
 		end
     end
+    if MainM.minPanel.main.fontStrings ~= nil then
+		for k, v in pairs(Const.TrackerReduced) do v = v[1]
+            if GeneralM:isNotCommand(v) then
+        	    MainM.minPanel.main.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
+            end
+		end
+    end
 end
 
 function Tracker:main() -- fonction d'entrée, login started
@@ -65,6 +72,7 @@ end
 
 --rolling when earning / spending
 function Tracker:RecordMoney()
+    local upframe = CreateFrame("Frame")
     local f = CreateFrame("Frame")
     f:RegisterEvent("PLAYER_MONEY")
     f:SetScript("OnEvent", function()
@@ -74,6 +82,23 @@ function Tracker:RecordMoney()
 		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
         self:popUpData()
         NewGTM:popUpDataCompared()
+        if GTConfigs["GTupdateShow"] then
+            local TimeUp, once = 0, false
+            upframe:Show()
+            upframe:SetScript("OnUpdate", function(self, time) -- l'occasion de tester ma fonction de type timer!!
+                TimeUp = TimeUp + time
+                if TimeUp >= (GTConfigs["GTupdateTimer"]) + 1 and once then
+                    upframe:Hide()
+                end
+                if TimeUp >= GTConfigs["GTupdateTimer"] and once then
+                    UIFrameFadeOut(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 1, 0)
+                elseif TimeUp < GTConfigs["GTupdateTimer"] and not once then
+                    UIFrameFadeIn(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 0, 1)
+                    once = true
+                end
+            end)
+            
+        end
     end)
 end
 
