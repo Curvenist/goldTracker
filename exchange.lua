@@ -73,8 +73,6 @@ function Exchange:loginEvent()
     f:RegisterEvent("PLAYER_LOGIN")
     f:SetScript("OnEvent", function()
         self.currentMoney = self:GetMoney()
-        
-        
         if GTMoney[self.date] ~= nil then --loading existing data!
             self.dailyMoney = GTMoney[self.date].dailyMoney
             self.income = GTMoney[self.date].income
@@ -95,8 +93,6 @@ function Exchange:loginEvent()
             self:catchupDaily() -- for setting netValueD
             self.dailyCatch = true
         end
-        
-        
     end)
 end
 
@@ -114,7 +110,6 @@ end
 
 --save variables
 function Exchange:logoutEvent()
-
     local f = CreateFrame("Frame")
     f:RegisterEvent("PLAYER_LOGOUT")
     f:SetScript("OnEvent", function()

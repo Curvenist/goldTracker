@@ -24,7 +24,6 @@ end
 return date
 end
 
-
 function DateM:ConversionAllDates()
 	for k, v in pairs(GTMoney) do
 		local elems = GTMoney[k]
@@ -168,6 +167,28 @@ function DateM:checkLastCoDate(TrackerDate)
     return originDiff[1]
 end
 
+-- This function allows us to always bring the timestamp to the current UTC day start, useful when hour changes!
+-- FTDS = force to day start
+function DateM:TTC(timestamp)
+	local FTDS = {
+    	year =  date("%Y", timestamp),
+		month =  date("%m", timestamp),
+		day =  date("%d", timestamp),
+		hour = 0, min = 0, sec = 0
+	}
+	local timediff = timestamp - (time(FTDS))
+	if timediff > 0 then
+		timediff = (24*60*60) - timediff
+		FTDS = {
+			year =  date("%Y", timestamp + timediff),
+				month =  date("%m", timestamp + timediff),
+				day =  date("%d", timestamp + timediff),
+				hour = 0, min = 0, sec = 0
+		}
+	end
+	return time(FTDS)
+end
+
 
 function DateM:CurrentWeekDays(timestamp, dayStart, nbDays, array)
 	nbDays, dayStart, array = nbDays or 7, dayStart or 3, array or {}
@@ -177,7 +198,7 @@ function DateM:CurrentWeekDays(timestamp, dayStart, nbDays, array)
 		currentDay = nbDays + currentDay
 	end
 	for i = 1, (currentDay - dayStart) do
-	  array[i] = timestamp - (24 * 60 * 60)*i
+	  array[i] = self:TTC(timestamp - (24 * 60 * 60)*i)
 	end
 	return array
 end
@@ -194,10 +215,10 @@ function DateM:WeekSegmentation(timestamp, dayStart, nbDays, array)
 		currentDay = nbDays + currentDay
 	end
 	if currentDay ~= dayStart then
-	  timestamp = timestamp - (24 * 60 * 60)*(currentDay-dayStart)
+	  timestamp = self:TTC(timestamp - (24 * 60 * 60)*(currentDay-dayStart))
 	end
 	for i = 1, nbDays do
-	  array[i] = timestamp - (24 * 60 * 60)*i*forward
+	  array[i] = self:TTC(timestamp - (24 * 60 * 60)*i*forward)
 	end
 
 	return array
@@ -214,18 +235,18 @@ function DateM:MonthSegmentation(timestamp, dayStart, nbDays, array)
 		currentDay = nbDays + currentDay
 	end
 	if currentDay ~= dayStart then
-	  timestamp = timestamp - (24 * 60 * 60)*(currentDay-dayStart)
+	  timestamp = self:TTC(timestamp - (24 * 60 * 60)*(currentDay-dayStart))
 	end
 
 	local checkM, check = tonumber(date("%m", timestamp)), true
 	local starting, ending = 1, 7
-	currentMonth = tonumber(date("%m", difftime(timestamp, (24 * 60 * 60)*ending))) -- positionning ourselves in the wednesday of the preious week
+	currentMonth = tonumber(date("%m", self:TTC(timestamp - (24 * 60 * 60)*ending))) -- positionning ourselves in the day of the preious week
 	while check == true do
-		checkM = tonumber(date("%m", difftime(timestamp, (24 * 60 * 60)*ending)))
+		checkM = tonumber(date("%m", self:TTC(timestamp - (24 * 60 * 60)*ending)))
 		
 		if checkM == currentMonth then 
 			for i = starting, ending do 
-				array[i] = difftime(timestamp, (24 * 60 * 60)*i)
+				array[i] = self:TTC(timestamp - (24 * 60 * 60)*i)
 			end
 		else
 			check = false  

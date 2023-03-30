@@ -7,7 +7,7 @@ TrackerInstance = {
 	netEarning = 0, -- the current earning -- chose not to be recorded in data as its a process of calculation
     income = 0, -- plain income
     spending = 0, -- plain spending
-    -- net value is recorded gain or loss when the player was not connected, see @Tracker:dailyCatch()
+    -- net value is recorded gain or loss when the player was not connected, see @TrackerInstance:dailyCatch()
     netValueD = 0, -- netValueD is based on LASTDATE check
     netValue = 0, -- netValueD is based on CURRENTDATE check - so those values are different
     dailyCatch = false

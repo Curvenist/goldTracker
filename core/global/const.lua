@@ -8,6 +8,7 @@ Const = {
 		CommonTranslations = {
 			{"Greet", "Bonjour %player, voici le récapitulatif de votre activité :", "Hello %player, here is your activity summary:"},
 			{"Performance", "Performance", "Performance"},
+			{"AddonTitle", "GoldTracker"}
 		},
 		MenuButtons = {
 			{"TrackerCurrent", "Gold Tracker", "Gold Tracker"}, -- default
@@ -42,11 +43,10 @@ Const = {
 		TrackerReduced = {
 			{"income", "Revenu", "Income"},
 			{"spending", "Dépense", "Spending"},
-			{"%drawLine"},
 			{"netEarning", "Performance", "Performance"},
 			{"%rating", "Perf / moyenne n-1", "Perf / avg n-1"},
 		},
-        TrackerCurrent = { 
+        TrackerCurrent = {
             {"currentMoney", "Epargne", "Savings"},
 			{"income", "Revenu", "Income"},
 			{"spending", "Dépense", "Spending"},
@@ -60,18 +60,14 @@ Const = {
 			{"netEarning", nil},
 			{"stat", nil}
 		},
-		AdvancedStatOp = { --this object should only allow arithmetic values in the end
-			{"%outfn:GTM:weekScope", "Hebdomadaire: %value -> %value", "Weekly Summary"}, -- our Week Scope
+		AdvancedStatOp = { --this object should only allow arithmetic values
+			{"%outfn:GTM:weekScope", "Hebdomadaire: du %value au %value", "Weekly Summary: from %value to %value"}, -- our Week Scope
 			{"%fn:Stats:average", "Moyenne", "Average"},
 			{"%fn:Stats:plainPerformance", "Somme", "Sum"},
 			{"%drawLine"},
-			{"%outfn:GTM:monthScope", "Mois courant: %value -> %value", "Monthly Summary"}, -- in any case, our current Month scope
+			{"%outfn:GTM:monthScope", "Mois courant: du %value au %value", "Monthly Summary: from %value to %value"}, -- in any case, our current Month scope
 			{"%fn:Stats:average", "Moyenne", "Average"},
 			{"%fn:Stats:plainPerformance", "Somme", "Sum"},
-			{"%drawLine"},
-			{"%outfn:GTM:monthPrevScope", "Mois précédent: %value -> %value", "Monthly Summary Reminder"}, -- this is for checking case we have first week of the month, we get the previous one!
-			{"%fn:Stats:average", "Moyenne", "Average"},
-			{"%fn:Stats:plainPerformance", "Somme", "Sum"}
 		},
 		AdvancedStat = {
 			{"name", nil},

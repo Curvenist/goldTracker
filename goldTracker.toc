@@ -1,7 +1,7 @@
-## Interface: 100005
+## Interface: 100007
 ## Title: goldTracker
 ## Author: Fixer
-## Version: 1.0
+## Version: 0.7
 ## SavedVariablesPerCharacter: GTMoney
 ## SavedVariables: GTConfigs
 
@@ -11,8 +11,8 @@ libs/LibDBIcon-1.0/LibDBIcon-1.0/lib.xml
 libs/LibGraph-2.0/LibStub.lua
 libs/LibGraph-2.0/LibGraph-2.0/LibGraph-2.0.lua
 
-core/app/optionsInterface.lua
-core/app/optionsApp.lua
+core/options/optionsInterface.lua
+core/options/optionsApp.lua
 
 core/global/const.lua
 core/global/money.lua
@@ -27,6 +27,5 @@ core/app/Config.lua
 core/app/GTM.lua
 core/app/TrackerInstance.lua
 core/app/tracker.lua
-core/global/generalM.lua
 
 core/ordering.lua

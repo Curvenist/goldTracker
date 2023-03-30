@@ -7,10 +7,10 @@ $core = "core"
 $exclusion = @("dataManagement.lua", "graphM.lua")
 
 $init = 
-"## Interface: 100005
+"## Interface: 100007
 ## Title: goldTracker
 ## Author: Fixer
-## Version: 1.0
+## Version: 0.7
 ## SavedVariablesPerCharacter: GTMoney
 
 libs/LibDBIcon-1.0/embeds.xml

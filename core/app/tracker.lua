@@ -4,17 +4,17 @@ NewConfig = Config:new()
 
 function Tracker:popUpData()
 	Tracker:find("netEarning")
-    if MainM.panel.mainElementTrackerCurrent.fontStrings ~= nil then
+    if MainM.panel.contentTrackerCurrent.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerCurrent) do v = v[1]
             if GeneralM:isNotCommand(v) then
-        	    MainM.panel.mainElementTrackerCurrent.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
+        	    MainM.panel.contentTrackerCurrent.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
             end
 		end
     end
-    if MainM.minPanel.main.fontStrings ~= nil then
+    if MainM.minPanel.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerReduced) do v = v[1]
             if GeneralM:isNotCommand(v) then
-        	    MainM.minPanel.main.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
+        	    MainM.minPanel.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
             end
 		end
     end
@@ -62,6 +62,7 @@ function Tracker:loginEvent()
 		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
 
         self:popUpData()
+
         NewGTM:main(GTMoney)
         NewConfig:popUpData()
         NewGTM:popUpStaticReport()
@@ -78,26 +79,40 @@ function Tracker:RecordMoney()
     f:SetScript("OnEvent", function()
         local amount = self.currentMoney - self:GetMoney()
         self:updateFlux(amount)
-        self.currentMoney = self:GetMoney() --updating Our Current money
+        self.currentMoney = self:GetMoney()
 		self:update("netEarning", self.income + self.netValueD + self.netValue - self.spending)
+
         self:popUpData()
         NewGTM:popUpDataCompared()
-        if GTConfigs["GTupdateShow"] then
-            local TimeUp, once = 0, false
+
+        if GTConfigs["GTupdateShow"] == 1 then
+            local TimeUp, triggeronce = 0, false 
             upframe:Show()
-            upframe:SetScript("OnUpdate", function(self, time) -- l'occasion de tester ma fonction de type timer!!
+            upframe:SetScript("OnUpdate", function(self, time)
                 TimeUp = TimeUp + time
-                if TimeUp >= (GTConfigs["GTupdateTimer"]) + 1 and once then
+                if TimeUp >= GTConfigs["GTupdateTimer"] and triggeronce then
+                    if GTConfigs["GTupdateShowType"] == 1 then
+                        if MainM.panel:IsShown() and MainM.panel.contentTrackerCurrent:IsVisible() then
+                            IntFns:getFn("TrackerCurrent")
+                            UIFrameFadeOut(MainM.panel, GTConfigs["GTupdateTimer"] / 4, 1, 0)
+                        end
+                    elseif GTConfigs["GTupdateShowType"] == 2 then
+                        UIFrameFadeOut(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 1, 0)
+                    end
+                    triggeronce = false
                     upframe:Hide()
-                end
-                if TimeUp >= GTConfigs["GTupdateTimer"] and once then
-                    UIFrameFadeOut(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 1, 0)
-                elseif TimeUp < GTConfigs["GTupdateTimer"] and not once then
-                    UIFrameFadeIn(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 0, 1)
-                    once = true
+                elseif TimeUp < GTConfigs["GTupdateTimer"] and not triggeronce then
+                    if GTConfigs["GTupdateShowType"] == 1 then
+                        if not MainM.panel:IsShown() and not MainM.panel.contentTrackerCurrent:IsVisible() then
+                            IntFns:getFn("TrackerCurrent")
+                            UIFrameFadeIn(MainM.panel, GTConfigs["GTupdateTimer"] / 4, 0, 1)
+                        end
+                    elseif GTConfigs["GTupdateShowType"] == 2 then
+                        UIFrameFadeIn(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 0, 1)
+                    end
+                    triggeronce = true
                 end
             end)
-            
         end
     end)
 end

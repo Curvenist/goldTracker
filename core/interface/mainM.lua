@@ -1,10 +1,10 @@
 MainM = {
-    options = true,
+	options = true,
     optVal = nil,
     panel = nil,
 	isShown = {container = true, reduced = true},
 
-	p = {
+    p = {
 		w = 500,
 		h = 250,
 	},
@@ -31,6 +31,19 @@ MainM = {
 	}
 }
 
+function MainM:getHeight(Height)
+	return self.p.h
+end
+
+function MainM:getWidth(Width)
+	return self.p.w
+end
+
+function MainM:loadStyle()
+    local font = CreateFont("DSnormal")
+    font:SetFont(OptInt:get("font"), 11, "")
+end
+
 VProperties = {}
 
 function VProperties:get(index)
@@ -41,27 +54,19 @@ function VProperties:get(index)
 end
 
 function VProperties:update()
+    self.interface = {w = MainM:getWidth(), h = MainM:getHeight() * 2} --in the interface panel
 	self.container = {w = MainM:getWidth(), h = MainM:getHeight()}
 	self.menuBox = {w = MainM:getWidth() / 4, h = MainM:getHeight()}
 	self.mainBox = {w = (MainM:getWidth() - MainM:getWidth() / 1.5), h = MainM:getHeight()}
 	self.padding = {w = MainM:getWidth() * 0.05, h = MainM:getHeight() * -0.05} -- margins are 5% of the max size
+	self.reduced = {w = MainM:getWidth() / 4, h = MainM:getHeight() / 2}
 	self.textSize = {false, MainM.textSize(MainM.p.h)}
-	self.reduced = {w = MainM:getWidth() / 3, h = MainM:getHeight() / 2}
 end
 
 function VProperties:marges(index)
 	self.margin = {w = self:get(index)['w'] * 0.1, h = self:get(index)['h'] * -0.1} -- this a global margin of 10%
 	self.steps = {w = self:get(index)['w'] * 0, h = self:get(index)['h'] * -0.1} -- next iteration element position
 	self.nextItemPos = {w = self:get(index)['w'] * 0.5, h = self:get(index)['h'] * 0} -- in case we have at least 2 values on same line, like label / value
-end
-
-
-function MainM:getHeight(Height)
-	return self.p.h
-end
-
-function MainM:getWidth(Width)
-	return self.p.w
 end
 
 function MainM:dynamicArrayExtent(obj, frame)
@@ -74,26 +79,37 @@ function MainM:dynamicArrayExtent(obj, frame)
 end
 
 function MainM:main()
+	self:loadStyle()
     local f = CreateFrame("Frame")
     f:RegisterEvent("ADDON_LOADED")
     f:SetScript("OnEvent", function(___, event, addonname)
         if addonname == "goldTracker" then
 			VProperties:update()
-			self:setupOverlay(addonname) --library
+			self:setupOverlay(addonname)
 
-			self.minPanel = self:setupFrame("reduced", "reduced")
+			-- todo : we should really think about squasing all the options there. Remember, firt we need a frame setup then adding the element to the frame
+			self.minPanel = self:setupFrame("reduced", "reduced", {false, true, true})
 			self.minPanel.texture = self:addTexture(self.minPanel)
-			self.minPanel.buttonResize = self:appendResizeBorder(VProperties.textSize, {"minPanel"})
+			self.minPanel.buttonResize = self:appendResizeBorder({"minPanel"})
 			VProperties:marges("mainBox")
 			X, Y = {0, 0, 100}, {0, -20, 0}
-			self.minPanel.main = self:addPanelElementItem("reducedData", Const.TrackerReduced, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", VProperties.textSize, {"minPanel"})
+			self.minPanel.main = self:addPanelElementItem("reducedData", Const.TrackerReduced, self:setPosition({"CENTER",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", {"minPanel"})
 			self.minPanel:Hide()
 
-			self.panel = self:setupFrame("main", "container")
+			-- self.interface = self:setupFrame("interface", "interface", {false, false, false})
+			-- self.interface.name = Const.CommonTranslations[3][2]
+			-- VProperties:marges("mainBox")
+			-- X, Y = {0, 0, 100}, {0, -20, 0}
+			-- for k, v in pairs(Const.Options) do
+			-- 	self.interface["option" .. k] = self:addPanelElementSingleItem("interface", Const.Options[k], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), Const.Options[k][3], {"interface"})
+			-- 	Y[1] = Y[1] + Y[2]
+			-- end
+			-- InterfaceOptions_AddCategory(self.interface)
+
+			self.panel = self:setupFrame("main", "container", {true, true, true})
 			self.panel.texture = self:addTexture(self.panel)
-			--self.panel:Hide()
-			self.panel.buttonClose = self:appendCloseBox(VProperties.textSize)
-			self.panel.buttonResize = self:appendResizeBorder(VProperties.textSize, {"panel"})
+			self.panel.buttonClose = self:appendCloseBox()
+			self.panel.buttonResize = self:appendResizeBorder({"panel"})
 
 			--@todo here gonna add buttons for options
 			VProperties:marges("menuBox")
@@ -104,28 +120,29 @@ function MainM:main()
 			X, Y = {VProperties.padding.w, 0, VProperties.nextItemPos.w}, {0, -20, 0}
 			for k, v in pairs(Const.MenuButtons) do
 				Y[1] = Y[1] + Y[2]
-				self.panel.menuElement[k] = self:addPanelSingleButton("menuElement" .. k, Const.MenuButtons[k], self:setPosition({"TOPLEFT", VProperties.menuBox.w, VProperties.menuBox.h, X, Y}), VProperties.textSize, {"panel", "menu"})
+				self.panel.menuElement[k] = self:addPanelSingleButton("menuElement" .. k, Const.MenuButtons[k], self:setPosition({"TOPLEFT", VProperties.menuBox.w, VProperties.menuBox.h, X, Y}), {"panel", "menu"})
 			end
 
 			VProperties:marges("mainBox")
 			X, Y = {100, 0, 25}, {0, -20, 0}
 			self.panel.main = self:addPanelElementItem("menu", nil, self:setPosition({"TOPLEFT", VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame")
+			
 
 			X, Y = {VProperties.padding.w + X[1], 0 + X[2], VProperties.nextItemPos.w + X[3]}, {0 + Y[2], Y[2], Y[3]}
 			for k, v in pairs(Const.MenuButtons) do
 				obj = Const.MenuButtons
 				local item = Const[obj[k][1]]
-				local name = "mainElement" .. obj[k][1]
+				local name = "content" .. obj[k][1]
 				if obj[k][1] == "Options" then
 					local keep = Y[1]
 					for k2, v2 in pairs(Const[obj[k][1]]) do
-						self.panel[name .. k2] = self:addPanelElementSingleItem(name .. k2, item[k2], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), item[k2][3], VProperties.textSize, {"panel", "main"})
-						Y[1] = Y[1] + Y[2]
+						self.panel[name .. k2] = self:addPanelElementSingleItem(name .. k2, item[k2], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), item[k2][3], {"panel", "main"})
 						self.panel[name .. k2]:Hide()
+						Y[1] = Y[1] + Y[2]
 					end
 					Y[1] = keep
 				else
-					self.panel[name] = self:addPanelElementItem(name, item, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", VProperties.textSize, {"panel", "main"})
+					self.panel[name] = self:addPanelElementItem(name, item, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", {"panel", "main"})
 				end
 				if k ~= 1 and obj[k][1] ~= "Options" then
 					self.panel[name]:Hide()
@@ -142,18 +159,18 @@ function MainM:MenuButtonNavAction(switch)
 		if obj[k][1] == switch then 
 			if obj[k][1] == "Options" then
 				for k2 in pairs(Const[obj[k][1]]) do
-					self.panel["mainElement" .. obj[k][1] .. k2]:Show()
+					self.panel["content" .. obj[k][1] .. k2]:Show()
 				end
 			else
-			self.panel["mainElement" .. obj[k][1]]:Show()
+			self.panel["content" .. obj[k][1]]:Show()
 			end
 		else 
 			if obj[k][1] == "Options" then
 				for k2 in pairs(Const[obj[k][1]]) do
-					self.panel["mainElement" .. obj[k][1] .. k2]:Hide()
+					self.panel["content" .. obj[k][1] .. k2]:Hide()
 				end
 			else
-			self.panel["mainElement" .. obj[k][1]]:Hide()
+			self.panel["content" .. obj[k][1]]:Hide()
 			end
 		end
 	end
@@ -164,8 +181,8 @@ function MainM:setupOverlay(addonname)
 		text = addonname,		
 		icon = "Interface\\icons\\inv_misc_bag_01",	
 		OnClick = function(s, btn)
-					if self.isShown.container then self.panel:Hide(); self.isShown.container = false
-					elseif not self.isShown.container then self.panel:Show() self.isShown.container = true end
+					if self.panel:IsShown() then self.panel:Hide();
+					elseif not self.panel:IsShown() then self.panel:Show() end
 					return
 				end
 		})
@@ -175,7 +192,7 @@ end
 
 --@todo we should add options in order to change size, colors etc!
 
-function MainM:setupFrame(name, obj)
+function MainM:setupFrame(name, obj, options)
 	local width, height = VProperties[obj].w, VProperties[obj].h
 	local panel = CreateFrame("Frame", name)
 	panel:SetFrameStrata("BACKGROUND")
@@ -185,68 +202,99 @@ function MainM:setupFrame(name, obj)
 	panel:EnableKeyboard(true)
 	panel:EnableMouse(true)
 	panel:SetPropagateKeyboardInput(true)
-	panel:SetMovable(true)
-	panel:SetResizable(true)
-	panel:SetResizeBounds(width / 2, height / 2, width * 2, height * 2)
-	panel:SetUserPlaced(true)
+	
 	panel:RegisterForDrag("LeftButton")
-	if obj == "container" then
+	if options[1] == true then -- escape close
 		panel:SetScript("OnKeyDown", function (arg, key) 
 		if key == "ESCAPE" then
-			panel:Hide(); self.isShown[obj] = false;
+			panel:Hide();
 		end 
 		end)
 	end
-	panel:SetScript("OnDragStart", function (arg, key) 
-		arg:StartMoving()
+	if options[2] == true then -- draggable
+		panel:SetMovable(true)
+		panel:SetScript("OnDragStart", function (arg, key) 
+			arg:StartMoving()
 		end)
-	panel:SetScript("OnDragStop", function (arg, key) 
-		arg:StopMovingOrSizing()
-		self.p.w = panel:GetWidth()
-		self.p.h = panel:GetHeight()
-		VProperties:update()
+		panel:SetScript("OnDragStop", function (arg, key) 
+			arg:StopMovingOrSizing()
+			self.p.w = panel:GetWidth()
+			self.p.h = panel:GetHeight()
+			VProperties:update()
 		end)
+		panel:SetUserPlaced(true)
+	end
+	if options[3] == true then -- resize
+		panel:SetResizable(true)
+		panel:SetResizeBounds(width / 2, height / 2, width * 2, height * 2)
+	end
 	panel:SetPoint("CENTER", 0, 0)
 	return panel
 end
 
 
-function MainM:addTexture(frame)
+function MainM:addTexture(frame, hB)
 	frame = frame or self.panel
 	local t = frame:CreateTexture(nil, "BACKGROUND")
 	t:SetAllPoints()
-	t:SetColorTexture(0, 0, 0, 0.5)
+	t:SetColorTexture(0, 0, 0, 0.7)
+	if type(hB) == "table" then
+		self:addBorder(frame, hB)
+	end
 	return t
 end
 
-function MainM:appendCloseBox(textSpacing, frame)
+function MainM:addBorder(frame, hB)
+	local fbord = CreateFrame("Frame", nil, frame)
+	fbord:SetAllPoints(frame)
+	fbord:SetFrameStrata("BACKGROUND")
+	fbord:SetFrameLevel(1)
+	if hB[1] == 1 then -- how setpoint work, we always start as diagonal to bottom left to top rigth, we just need to swap to correct position
+		fbord.top = fbord:CreateTexture(nil, "BORDER")
+		fbord.top:SetPoint("BOTTOMLEFT", fbord, "TOPLEFT", 0, 1)
+		fbord.top:SetPoint("TOPRIGHT", fbord, "TOPRIGHT", 0, 0)
+		fbord.top:SetColorTexture(0.7, 0.7, 0.7, 1)
+	end	
+	if hB[2] == 1 then
+		fbord.right = fbord:CreateTexture(nil, "BORDER")
+		fbord.right:SetPoint("BOTTOMLEFT", fbord, "BOTTOMRIGHT", 0, 1)
+		fbord.right:SetPoint("TOPRIGHT", fbord, "TOPRIGHT", 1, 0)
+		fbord.right:SetColorTexture(0.7, 0.7, 0.7, 1)
+	end
+	if hB[3] == 1 then
+		fbord.bot = fbord:CreateTexture(nil, "BORDER")
+		fbord.bot:SetPoint("BOTTOMLEFT", fbord, "BOTTOMLEFT", 1, 0)
+		fbord.bot:SetPoint("TOPRIGHT", fbord, "BOTTOMRIGHT", 0, 1)
+		fbord.bot:SetColorTexture(0.7, 0.7, 0.7, 1)
+	end
+	if hB[4] == 1 then
+		fbord.left = fbord:CreateTexture(nil, "BORDER")
+		fbord.left:SetPoint("BOTTOMLEFT", fbord, "BOTTOMLEFT", 0, 0)
+		fbord.left:SetPoint("TOPRIGHT", fbord, "TOPLEFT", 1, 0)
+		fbord.left:SetColorTexture(0.7, 0.7, 0.7, 1)
+	end
+	return fbord
+end
+
+function MainM:appendCloseBox(frame)
 	frame = (frame ~= nil and #frame >= 1 and self:dynamicArrayExtent(frame, self)) or self.panel
 	--frame = (frame ~= nil and #frame == 1 and self[frame[1]]) or self.panel
 	local f = CreateFrame("Button", nil, self.panel)
-	f:SetSize(textSpacing[2], textSpacing[2])
+	f:SetSize(15, 15)
 	f:SetPoint("TOPRIGHT", 0, 0)
-	f:SetAlpha(0.2)
-	local t = f:CreateFontString(nil, "OVERLAY")
-	t:SetFont(OptInt:get("font"), textSpacing[2] or 11)
-	t:SetPoint("TOP", 0, 0)
-	t:SetText("x")
-	
-	
-	f.fontString = t
-	
-	f:SetScript("OnEnter", function(self) self:SetAlpha(1) end)
-    f:SetScript("OnLeave", function(self) self:SetAlpha(0.2) end)
-
-	f:SetScript("OnClick", function () self.panel:Hide(); self.isShown.container = false; return end) 
+	f:SetNormalTexture("Interface\\buttons\\ui-panel-hidebutton-up")
+	f:SetHighlightTexture("Interface\\buttons\\ui-panel-minimizebutton-Highlight")
+	f:SetPushedTexture("Interface\\buttons\\ui-panel-hidebutton-down")
+	f:SetScript("OnClick", function () frame:Hide() return end) 
 	return f
 end
 
-function MainM:appendResizeBorder(textSpacing, frame)
+function MainM:appendResizeBorder(frame)
 	frame = (frame ~= nil and #frame >= 1 and self:dynamicArrayExtent(frame, self)) or self.panel
 	--frame = (frame ~= nil and #frame == 1 and self[frame[1]]) or self.panel
 	local b = CreateFrame("Button", nil, frame)
 	b:EnableMouse(true)
-	b:SetSize(textSpacing[2], 20)
+	b:SetSize(15, 15)
 	b:SetPoint("BOTTOMRIGHT")
 
 	b:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
@@ -262,17 +310,17 @@ function MainM:appendResizeBorder(textSpacing, frame)
 	return b
 end
 
-function MainM:addPanelElementItem(name, item, position, elemtype, textSpacing, parentFrame)
+function MainM:addPanelElementItem(name, item, position, elemtype, parentFrame)
 	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
 	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
 	local f = CreateFrame("Frame", name, parentFrame)
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
-	self:displayMenuElements(position[4], position[5], item, f, textSpacing, name)
+	self:displayMenuElements(position[4], position[5], item, f, name)
 	return f
 end
 
-function MainM:addPanelElementSingleItem(name, item, position, elemtype, textSpacing, parentFrame)
+function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentFrame)
 	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
 	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
 	local X, Y = position[4], position[5]
@@ -282,7 +330,7 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, textSpa
 	end
 	if elemtype == "EditBox" then
 		f = CreateFrame("EditBox", nil, parentFrame, "InputBoxTemplate")
-		f:SetFont(OptInt:get("font"), textSpacing[2] or 11, "")
+		f:SetFont(OptInt:get("font"), 11, "")
 		f:SetNumeric(true)
 		f:SetNumber(saved ~= nil and saved or item[4])
 		f:SetFrameStrata("LOW")
@@ -311,35 +359,35 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, textSpa
 				info.text, info.value, info.checked = v, k, false
 				info.menuList = v
 				info.func = function()
+					UIDropDownMenu_SetText(f, v)
 					UIDropDownMenu_SetSelectedValue(f, k)
 					GTConfigs[item[1]] = UIDropDownMenu_GetSelectedValue(f, k)
 				end
 				UIDropDownMenu_AddButton(info)
 			end
 		end)
+		UIDropDownMenu_SetText(f, saved ~= nil and item[5][1][saved] or item[5][1][item[4]])
 		UIDropDownMenu_SetSelectedValue(f, saved ~= nil and saved or item[4])
 	end
 	f:SetPoint(position[1], X[1], Y[1])
-	local l = f:CreateFontString(nil, "OVERLAY")
-	l:SetFont(OptInt:get("font"), textSpacing[2] or 11)
+	local l = f:CreateFontString(nil, "OVERLAY", "DSnormal")
 	l:SetPoint(position[1], elemtype == "label" and 0 or X[1], 0)
 	l:SetText(item[2][1])
 
 	return f
 end
 
-function MainM:addPanelSingleButton(name, item, position, textSpacing, parentFrame)
+function MainM:addPanelSingleButton(name, item, position, parentFrame)
 	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
 	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
 	local X, Y = position[4], position[5]
 
 	local f = CreateFrame("Button", name, parentFrame)
 	f:SetPoint(position[1], X[1], Y[1])
-	f:SetSize(100, 11)
+	f:SetSize(100, 15)
 	f:SetAlpha(0.2)
 	
-	local t = f:CreateFontString(nil, "OVERLAY")
-	t:SetFont(OptInt:get("font"), textSpacing[2] or 11)
+	local t = f:CreateFontString(nil, "OVERLAY", "DSnormal")
 	t:SetPoint(position[1], X[1])
 	t:SetText(item[2])
 	
@@ -352,7 +400,7 @@ function MainM:addPanelSingleButton(name, item, position, textSpacing, parentFra
 end
 
 
-function MainM:addPanelElementMethod(name, method, position, type, script, textSpacing)
+function MainM:addPanelElementMethod(name, method, position, type, script)
 	local f = CreateFrame(type, name, self.panel)
 	f:SetSize(position[2], position[3])
 	f:SetPoint(position[1], 0, 0)
@@ -404,7 +452,7 @@ end
 -- X = {x, sX, valueXPos} => sX for stepX, valueXPos is the marker for positionning the value on X abs (horizontal)
 -- Y = {y, sY, valueYPos} => sy for stepY, valueYPos is the same // on Y (vertical)
 -- This method sets up a system with a label : value displaying date, most common
-function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
+function MainM:displayMenuElements(X, Y, item, frame, name)
     local X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
     frame = frame or self.panel
     frame.fontStrings = {}
@@ -415,19 +463,13 @@ function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
 		if type(frame.elems[name]) ~= "table" then
 			if value ~= nil then
 				local linetext = nil
-				linetext = frame:CreateFontString(nil, "OVERLAY")
-				linetext:SetFont(OptInt:get("font"), textSpacing[2] or 11)
+				linetext = frame:CreateFontString(nil, "OVERLAY", "DSnormal")
 				linetext:SetJustifyH("left")
 				linetext:SetPoint("TOPLEFT", X[1], Y[1])
 				linetext:SetText(value)
-				
 				frame.fontStrings[key .. increment .. "Text"] = linetext
 			end
-				local linevalue = frame:CreateFontString(nil, "OVERLAY")
-				if textSpacing[1] then 
-					linevalue:SetSpacing(math.abs(Y[2]))
-				end
-				linevalue:SetFont(OptInt:get("font"), textSpacing[2] or 11)
+				local linevalue = frame:CreateFontString(nil, "OVERLAY", "DSnormal")
 				linevalue:SetJustifyH("left")
 				linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
 				frame.fontStrings[key .. increment] = linevalue
@@ -444,11 +486,9 @@ function MainM:displayMenuElements(X, Y, item, frame, textSpacing, name)
 			end
 		end
 	end
-
-
 	return frame
 end
---InterfaceOptions_AddCategory(frame)
+
 
 -- This function allows us to create quickly objects with a command line in the constant, like drawing a line
 function MainM:elementCommand(frame, value, X, Y)
@@ -456,7 +496,7 @@ function MainM:elementCommand(frame, value, X, Y)
 	return  GeneralM:case(string.find(value, "%%drawLine") ~= nil, function ()
 			l = frame:CreateLine()
 			local width = (VProperties.mainBox.w)
-			l:SetColorTexture(1, 1, 1, 1)
+			l:SetColorTexture(0.7, 0.7, 0.7, 1)
 			l:SetStartPoint("TOP", X[1], Y[1])
 			l:SetEndPoint("TOP", X[1] + (width * 0.8), Y[1])
 			l:SetThickness(1)
@@ -480,3 +520,10 @@ function MainM:panelSide()
 end
 
 
+-- if elemtype == "ScrollFrame" then
+-- 	local scrollFrame = CreateFrame("ScrollFrame", nil, parentFrame, "UIPanelScrollFrameCodeTemplate")
+-- 	scrollFrame:SetScrollChild(f)
+-- 	scrollFrame:SetWidth(position[2])
+-- 	scrollFrame:SetHeight(position[3]) 
+-- 	return scrollFrame
+-- end

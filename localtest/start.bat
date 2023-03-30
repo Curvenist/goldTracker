@@ -1,0 +1,2 @@
+cls
+lua main.lua

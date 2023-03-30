@@ -1,6 +1,6 @@
 --GTM : GTMoneyMethods
 GTM = {
-	data = nil,
+	data = {},
 	timeArray = {},
 	limits = {10^3, -10^3},
 
@@ -82,7 +82,7 @@ function GTM:initTimeArrayInterval(val)
 end
 
 function GTM:popUpStaticReport()
-	local panel, incomeType = MainM.panel.mainElementAdvancedStatOp, self.options["incomeNature"]
+	local panel, incomeType = MainM.panel.contentAdvancedStatOp, self.options["incomeNature"]
 	-- first, we need to create statistics, so we need to take the incomeType, store it and sens it to the stat function to get the result
 	if panel ~= nil then
 		for k, v in pairs(Const.AdvancedStatOp) do
@@ -116,7 +116,7 @@ function GTM:popUpStaticReport()
 end
 
 function GTM:popUpDataCompared()
-	local panelCentral, incomeType = MainM.panel.mainElementTrackerCurrent.fontStrings, self.options["incomeNature"]
+	local panelCentral, incomeType = MainM.panel.contentTrackerCurrent.fontStrings, self.options["incomeNature"]
 	if panelCentral ~= nil then
 		local myVal = Tracker:find(incomeType)
 		local result = {self.statDevi:rating(myVal, self:getstoreOperation(1)), 1}
@@ -135,16 +135,14 @@ function GTM:popUpDataCompared()
 		end
 		
 		panelCentral["%rating6"]:SetText(translate[1])
-
 		if #self:getstoreTI() < 1 then
 			self:actualWeekScope(TrackerDate)
 			self:setstoreTI(myVal, 1)
 			for i, j in pairs(self:getTimeArray()) do
 				self.HistoryTI:constr(self.data[self:getTimeArray(i)]) self.HistoryTI:find(incomeType)
-				self:setstoreTI(self.HistoryTI[incomeType], i)
+				self:setstoreTI(self.HistoryTI[incomeType], i + 1)
 			end
 		end
-
 		result = self.statDevi:plainPerformance(self:getstoreTI())
         panelCentral["%sum7"]:SetText(Money:ConvertGold(result))
     end

@@ -2,7 +2,7 @@ IntFns = {
     TrackerCurrent = function () MainM:MenuButtonNavAction("TrackerCurrent") end,
     Options = function () MainM:MenuButtonNavAction("Options") end,
     AdvancedStatOp = function () MainM:MenuButtonNavAction("AdvancedStatOp") end
-        --{"graph", "Graphique"}
+    --{"graph", "Graphique"}
 }
 
 
