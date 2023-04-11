@@ -197,6 +197,7 @@ function DateM:CurrentWeekDays(timestamp, dayStart, nbDays, array)
 	if currentDay < dayStart then 
 		currentDay = nbDays + currentDay
 	end
+	print(currentDay, dayStart, nbDays)
 	for i = 1, (currentDay - dayStart) do
 	  array[i] = self:TTC(timestamp - (24 * 60 * 60)*i)
 	end

@@ -50,7 +50,7 @@ Const = {
             {"currentMoney", "Epargne", "Savings"},
 			{"income", "Revenu", "Income"},
 			{"spending", "Dépense", "Spending"},
-			{"%drawLine"},
+			{"%br"},
 			{"netEarning", "Performance", "Performance"},
 			{"%rating", "Perf / moyenne n-1", "Perf / avg n-1"},
 			{"%sum", "Cumul Hebdomadaire", "Weekly Cumulative"}
@@ -64,7 +64,7 @@ Const = {
 			{"%outfn:GTM:weekScope", "Hebdomadaire: du %value au %value", "Weekly Summary: from %value to %value"}, -- our Week Scope
 			{"%fn:Stats:average", "Moyenne", "Average"},
 			{"%fn:Stats:plainPerformance", "Somme", "Sum"},
-			{"%drawLine"},
+			{"%br"},
 			{"%outfn:GTM:monthScope", "Mois courant: du %value au %value", "Monthly Summary: from %value to %value"}, -- in any case, our current Month scope
 			{"%fn:Stats:average", "Moyenne", "Average"},
 			{"%fn:Stats:plainPerformance", "Somme", "Sum"},

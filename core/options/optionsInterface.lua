@@ -9,6 +9,7 @@ OptInt = {
     GTsquashDataType = 1,
     GTsquashDataTrigger = 30, -- days
     GTremoveOldData = 120, --days
+    GTtriggeronce = false,
 
     switch = {
         days = true,

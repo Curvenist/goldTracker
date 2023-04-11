@@ -5,8 +5,8 @@ MainM = {
 	isShown = {container = true, reduced = true},
 
     p = {
-		w = 500,
-		h = 250,
+		w = 300,
+		h = 160,
 	},
 
 	c = {
@@ -66,7 +66,7 @@ end
 function VProperties:marges(index)
 	self.margin = {w = self:get(index)['w'] * 0.1, h = self:get(index)['h'] * -0.1} -- this a global margin of 10%
 	self.steps = {w = self:get(index)['w'] * 0, h = self:get(index)['h'] * -0.1} -- next iteration element position
-	self.nextItemPos = {w = self:get(index)['w'] * 0.5, h = self:get(index)['h'] * 0} -- in case we have at least 2 values on same line, like label / value
+	self.nextItemPos = {w = self:get(index)['w'] * 0.8, h = self:get(index)['h'] * 0} -- in case we have at least 2 values on same line, like label / value
 end
 
 function MainM:dynamicArrayExtent(obj, frame)
@@ -89,25 +89,15 @@ function MainM:main()
 
 			-- todo : we should really think about squasing all the options there. Remember, firt we need a frame setup then adding the element to the frame
 			self.minPanel = self:setupFrame("reduced", "reduced", {false, true, true})
-			self.minPanel.texture = self:addTexture(self.minPanel)
+			self.minPanel.texture = self:addTexture({"minPanel"})
 			self.minPanel.buttonResize = self:appendResizeBorder({"minPanel"})
 			VProperties:marges("mainBox")
 			X, Y = {0, 0, 100}, {0, -20, 0}
-			self.minPanel.main = self:addPanelElementItem("reducedData", Const.TrackerReduced, self:setPosition({"CENTER",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", {"minPanel"})
+			self.minPanel.main = self:addPanelElementItem("reducedData", Const.TrackerReduced, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", {"minPanel"})
 			self.minPanel:Hide()
 
-			-- self.interface = self:setupFrame("interface", "interface", {false, false, false})
-			-- self.interface.name = Const.CommonTranslations[3][2]
-			-- VProperties:marges("mainBox")
-			-- X, Y = {0, 0, 100}, {0, -20, 0}
-			-- for k, v in pairs(Const.Options) do
-			-- 	self.interface["option" .. k] = self:addPanelElementSingleItem("interface", Const.Options[k], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), Const.Options[k][3], {"interface"})
-			-- 	Y[1] = Y[1] + Y[2]
-			-- end
-			-- InterfaceOptions_AddCategory(self.interface)
-
 			self.panel = self:setupFrame("main", "container", {true, true, true})
-			self.panel.texture = self:addTexture(self.panel)
+			self.panel.texture = self:addTexture({"panel"})
 			self.panel.buttonClose = self:appendCloseBox()
 			self.panel.buttonResize = self:appendResizeBorder({"panel"})
 
@@ -123,9 +113,10 @@ function MainM:main()
 				self.panel.menuElement[k] = self:addPanelSingleButton("menuElement" .. k, Const.MenuButtons[k], self:setPosition({"TOPLEFT", VProperties.menuBox.w, VProperties.menuBox.h, X, Y}), {"panel", "menu"})
 			end
 
+			-- MainBOX PART, be sure to create a scrollFrame first
 			VProperties:marges("mainBox")
 			X, Y = {100, 0, 25}, {0, -20, 0}
-			self.panel.main = self:addPanelElementItem("menu", nil, self:setPosition({"TOPLEFT", VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame")
+			self.panel.main = self:addPanelElementItem("menu", nil, self:setPosition({"TOPLEFT", VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "ScrollFrame")
 			
 
 			X, Y = {VProperties.padding.w + X[1], 0 + X[2], VProperties.nextItemPos.w + X[3]}, {0 + Y[2], Y[2], Y[3]}
@@ -144,33 +135,48 @@ function MainM:main()
 				else
 					self.panel[name] = self:addPanelElementItem(name, item, self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), "Frame", {"panel", "main"})
 				end
-				if k ~= 1 and obj[k][1] ~= "Options" then
-					self.panel[name]:Hide()
+				if obj[k][1] ~= "Options" then
+					if k ~= 1 then
+						self.panel[name]:Hide()
+					end
+					if self.panel[name]:IsShown() then
+						self:AppendScroll(self.panel.main, self.panel[name])
+					end
 				end
+			
+					
 			end
         end
     end)
+end
+
+function MainM:AppendScroll(parentFrame, childFrame)
+	parentFrame:SetVerticalScroll(0)
+	parentFrame:SetHorizontalScroll(0)
+	parentFrame:SetScrollChild(childFrame)
 end
 
 function MainM:MenuButtonNavAction(switch)
 	local obj = Const.MenuButtons
 	switch = switch or obj[1][1]
 	for k, v in pairs(obj) do
-		if obj[k][1] == switch then 
-			if obj[k][1] == "Options" then
-				for k2 in pairs(Const[obj[k][1]]) do
-					self.panel["content" .. obj[k][1] .. k2]:Show()
+		local item = obj[k][1]
+		if item == switch then 
+			if item == "Options" then
+				for k2 in pairs(Const[item]) do
+					self.panel["content" .. item .. k2]:Show()
 				end
 			else
-			self.panel["content" .. obj[k][1]]:Show()
+			self.panel["content" .. item]:Show()
+			self:AppendScroll(self.panel.main, self.panel["content" .. item])
 			end
 		else 
-			if obj[k][1] == "Options" then
-				for k2 in pairs(Const[obj[k][1]]) do
-					self.panel["content" .. obj[k][1] .. k2]:Hide()
+			if item == "Options" then
+				for k2 in pairs(Const[item]) do
+					self.panel["content" .. item .. k2]:Hide()
 				end
 			else
-			self.panel["content" .. obj[k][1]]:Hide()
+			self.panel["content" .. item]:Hide()
 			end
 		end
 	end
@@ -234,10 +240,10 @@ end
 
 
 function MainM:addTexture(frame, hB)
-	frame = frame or self.panel
+	frame = (frame ~= nil and #frame >= 1 and self:dynamicArrayExtent(frame, self)) or self.panel
 	local t = frame:CreateTexture(nil, "BACKGROUND")
 	t:SetAllPoints()
-	t:SetColorTexture(0, 0, 0, 0.7)
+	t:SetColorTexture(0, 0, 0, 0.3)
 	if type(hB) == "table" then
 		self:addBorder(frame, hB)
 	end
@@ -313,10 +319,27 @@ end
 function MainM:addPanelElementItem(name, item, position, elemtype, parentFrame)
 	parentFrame = (parentFrame ~= nil and #parentFrame >= 1 and self:dynamicArrayExtent(parentFrame, self)) or self.panel
 	--parentFrame = (parentFrame ~= nil and #parentFrame == 2 and self[parentFrame[1]][parentFrame[2]]) or self.panel
-	local f = CreateFrame("Frame", name, parentFrame)
-	f:SetSize(position[2], position[3])
-	f:SetPoint(position[1], 0, 0)
-	self:displayMenuElements(position[4], position[5], item, f, name)
+	local f = nil
+	local X, Y = position[4], position[5]
+	if elemtype == "Frame" then
+		f = CreateFrame("Frame", name, parentFrame)
+		f:SetSize(position[2], position[3])
+		f:SetPoint(position[1], 0, 0)
+		self:displayMenuElements(position[4], position[5], item, f, name)
+	elseif elemtype == "ScrollFrame" then -- if we have a scroll frame, make sure our next element is child of if in order to append the SetChildProperty to the parentFrame
+		f = CreateFrame("ScrollFrame", nil, parentFrame)
+		f:SetPoint("TOPLEFT", 0, 0)
+		f:SetPoint("BOTTOMRIGHT", 0, 0)
+		f:SetScript("OnMouseWheel", function(_, delta)
+			local val = f:GetVerticalScroll() + delta * Y[2]
+			if val < 0 then
+				val = 0
+			elseif val > f:GetVerticalScrollRange() then
+				val = f:GetVerticalScrollRange()
+			end
+			f:SetVerticalScroll(val)
+		end)
+	end
 	return f
 end
 
@@ -333,10 +356,14 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 		f:SetFont(OptInt:get("font"), 11, "")
 		f:SetNumeric(true)
 		f:SetNumber(saved ~= nil and saved or item[4])
-		f:SetFrameStrata("LOW")
+		f:SetAutoFocus(false)
 		f:SetSize(15, 15)
-		f:SetScript("OnEditFocusLost", function()
-			GTConfigs[item[1]] = f:GetNumber()
+		f:SetScript("OnEditFocusGained", function(s) 
+		end)
+		f:SetScript("OnEditFocusLost", function(s)
+			GTConfigs[item[1]] = s:GetNumber()
+			s:ClearFocus()
+			s:HighlightText(0, 0)
 		end)
 	elseif elemtype == "CheckButton" then
 		f = CreateFrame("CheckButton", name, parentFrame, "ChatConfigCheckButtonTemplate")
@@ -369,9 +396,9 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 		UIDropDownMenu_SetText(f, saved ~= nil and item[5][1][saved] or item[5][1][item[4]])
 		UIDropDownMenu_SetSelectedValue(f, saved ~= nil and saved or item[4])
 	end
-	f:SetPoint(position[1], X[1], Y[1])
+	f:SetPoint(position[1], X[1] + X[1], Y[1])
 	local l = f:CreateFontString(nil, "OVERLAY", "DSnormal")
-	l:SetPoint(position[1], elemtype == "label" and 0 or X[1], 0)
+	l:SetPoint(position[1], -X[1], 0)
 	l:SetText(item[2][1])
 
 	return f
@@ -452,27 +479,27 @@ end
 -- X = {x, sX, valueXPos} => sX for stepX, valueXPos is the marker for positionning the value on X abs (horizontal)
 -- Y = {y, sY, valueYPos} => sy for stepY, valueYPos is the same // on Y (vertical)
 -- This method sets up a system with a label : value displaying date, most common
-function MainM:displayMenuElements(X, Y, item, frame, name)
+function MainM:displayMenuElements(X, Y, item, parentFrame, name)
     local X, Y = X or {0, 0, 100}, Y or {-20, -20, 0}
-    frame = frame or self.panel
-    frame.fontStrings = {}
-	frame.elems = {}
+    parentFrame = parentFrame or self.panel
+    parentFrame.fontStrings = {}
+	parentFrame.elems = {}
 
 	local createElement = function (increment, key, value) 
-		frame.elems[name] = self:elementCommand(frame, key, X, Y)
-		if type(frame.elems[name]) ~= "table" then
+		parentFrame.elems[name] = self:elementCommand(parentFrame, key, X, Y)
+		if type(parentFrame.elems[name]) ~= "table" then
 			if value ~= nil then
 				local linetext = nil
-				linetext = frame:CreateFontString(nil, "OVERLAY", "DSnormal")
+				linetext = parentFrame:CreateFontString(nil, "OVERLAY", "DSnormal")
 				linetext:SetJustifyH("left")
 				linetext:SetPoint("TOPLEFT", X[1], Y[1])
 				linetext:SetText(value)
-				frame.fontStrings[key .. increment .. "Text"] = linetext
+				parentFrame.fontStrings[key .. increment .. "Text"] = linetext
 			end
-				local linevalue = frame:CreateFontString(nil, "OVERLAY", "DSnormal")
+				local linevalue = parentFrame:CreateFontString(nil, "OVERLAY", "DSnormal")
 				linevalue:SetJustifyH("left")
 				linevalue:SetPoint("TOPLEFT", X[1] + X[3], Y[1] + Y[3])
-				frame.fontStrings[key .. increment] = linevalue
+				parentFrame.fontStrings[key .. increment] = linevalue
 		end
 		X[1] = X[1] + X[2]
         Y[1] = Y[1] + Y[2]
@@ -486,7 +513,7 @@ function MainM:displayMenuElements(X, Y, item, frame, name)
 			end
 		end
 	end
-	return frame
+	return parentFrame
 end
 
 
@@ -498,9 +525,14 @@ function MainM:elementCommand(frame, value, X, Y)
 			local width = (VProperties.mainBox.w)
 			l:SetColorTexture(0.7, 0.7, 0.7, 1)
 			l:SetStartPoint("TOP", X[1], Y[1])
-			l:SetEndPoint("TOP", X[1] + (width * 0.8), Y[1])
-			l:SetThickness(1)
-		 end) and l
+			l:SetEndPoint("TOP", X[1] + width, Y[1])
+			l:SetThickness(1) end) or
+			GeneralM:case(string.find(value, "%%br") ~= nil, function ()
+				l = frame:CreateFontString(nil, "OVERLAY")
+				l:SetPoint("TOPLEFT", X[1], Y[1])
+			end)
+			
+			and l
 end
 
 --looking for previous day or next day
@@ -520,10 +552,15 @@ function MainM:panelSide()
 end
 
 
--- if elemtype == "ScrollFrame" then
--- 	local scrollFrame = CreateFrame("ScrollFrame", nil, parentFrame, "UIPanelScrollFrameCodeTemplate")
--- 	scrollFrame:SetScrollChild(f)
--- 	scrollFrame:SetWidth(position[2])
--- 	scrollFrame:SetHeight(position[3]) 
--- 	return scrollFrame
+
+
+
+-- self.interface = self:setupFrame("interface", "interface", {false, false, false})
+-- self.interface.name = Const.CommonTranslations[3][2]
+-- VProperties:marges("mainBox")
+-- X, Y = {0, 0, 100}, {0, -20, 0}
+-- for k, v in pairs(Const.Options) do
+-- 	self.interface["option" .. k] = self:addPanelElementSingleItem("interface", Const.Options[k], self:setPosition({"TOPLEFT",  VProperties.mainBox.w, VProperties.mainBox.h, X, Y}), Const.Options[k][3], {"interface"})
+-- 	Y[1] = Y[1] + Y[2]
 -- end
+-- InterfaceOptions_AddCategory(self.interface)

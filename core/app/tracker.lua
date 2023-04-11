@@ -11,10 +11,10 @@ function Tracker:popUpData()
             end
 		end
     end
-    if MainM.minPanel.fontStrings ~= nil then
+    if MainM.minPanel.main.fontStrings ~= nil then
 		for k, v in pairs(Const.TrackerReduced) do v = v[1]
             if GeneralM:isNotCommand(v) then
-        	    MainM.minPanel.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
+        	    MainM.minPanel.main.fontStrings[v .. k]:SetText(Money:ConvertGold(self[v]))
             end
 		end
     end
@@ -84,13 +84,12 @@ function Tracker:RecordMoney()
 
         self:popUpData()
         NewGTM:popUpDataCompared()
-
-        if GTConfigs["GTupdateShow"] == 1 then
-            local TimeUp, triggeronce = 0, false 
+        if GTConfigs["GTupdateShow"] == true then
+            local TimeUp = 0
             upframe:Show()
             upframe:SetScript("OnUpdate", function(self, time)
                 TimeUp = TimeUp + time
-                if TimeUp >= GTConfigs["GTupdateTimer"] and triggeronce then
+                if TimeUp >= GTConfigs["GTupdateTimer"] and OptInt:get("GTtriggeronce") then
                     if GTConfigs["GTupdateShowType"] == 1 then
                         if MainM.panel:IsShown() and MainM.panel.contentTrackerCurrent:IsVisible() then
                             IntFns:getFn("TrackerCurrent")
@@ -99,9 +98,9 @@ function Tracker:RecordMoney()
                     elseif GTConfigs["GTupdateShowType"] == 2 then
                         UIFrameFadeOut(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 1, 0)
                     end
-                    triggeronce = false
+                    OptInt:set("GTtriggeronce", false)
                     upframe:Hide()
-                elseif TimeUp < GTConfigs["GTupdateTimer"] and not triggeronce then
+                elseif TimeUp < GTConfigs["GTupdateTimer"] and not OptInt:get("GTtriggeronce") then
                     if GTConfigs["GTupdateShowType"] == 1 then
                         if not MainM.panel:IsShown() and not MainM.panel.contentTrackerCurrent:IsVisible() then
                             IntFns:getFn("TrackerCurrent")
@@ -110,7 +109,7 @@ function Tracker:RecordMoney()
                     elseif GTConfigs["GTupdateShowType"] == 2 then
                         UIFrameFadeIn(MainM.minPanel, GTConfigs["GTupdateTimer"] / 4, 0, 1)
                     end
-                    triggeronce = true
+                    OptInt:set("GTtriggeronce", true)
                 end
             end)
         end
