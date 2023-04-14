@@ -378,11 +378,14 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 		f:SetSize(position[2], position[3])
 	elseif elemtype == "dropdown" then
 		f = CreateFrame("Frame", name, parentFrame, "UIDropDownMenuTemplate")
+		-- IntFns:CreateRadioDropDown(f, item[5][1])
+
 		UIDropDownMenu_Initialize(f, function(frame, level)
 			info = UIDropDownMenu_CreateInfo()
 			for k, v in pairs(item[5][1]) do
 				info.text, info.value, info.checked = v, k, false
 				info.menuList = v
+				info.minWidth = 80
 				info.func = function()
 					UIDropDownMenu_SetText(f, v)
 					UIDropDownMenu_SetSelectedValue(f, k)
@@ -390,9 +393,9 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 				end
 				UIDropDownMenu_AddButton(info)
 			end
+
 		end)
 		UIDropDownMenu_SetSelectedValue(f, saved ~= nil and saved or item[4])
-		
 		IntFns:ModifyDropDownTemplate(f)
 	end
 	f:SetPoint(position[1], X[1] + X[1], Y[1])

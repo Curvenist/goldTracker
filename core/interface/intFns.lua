@@ -13,9 +13,19 @@ function IntFns:getFn(index)
     return self[index]
 end
 
+function IntFns:CreateRadioDropDown(f, items)
+    --need to create :
+    --a frame hosting the selected value, the usual is left, middle, right
+    --a frame hosting the button on the right
+    --a frame hosting the list, we'll make it simple for now, no border
+    --iterate throught to create objets
+    local frame = f:CreateFrame("")
+end
+
 function IntFns:ModifyDropDownTemplate(f)
 
     f.Text:SetFont(OptInt:get("font"), 11, "")
+    
     f.Left:SetColorTexture(0, 0, 0, 0.5)
     f.Middle:SetColorTexture(0, 0, 0, 0.5)
     f.Right:SetColorTexture(0, 0, 0, 0.5)
@@ -24,7 +34,6 @@ function IntFns:ModifyDropDownTemplate(f)
     f.Middle:SetPoint("TOP", 0, 0)
     f.Right:SetPoint("TOP", 0, 0)
     
-    --UIDropDownMenu_SetWidth(f, 100)
     f.Left:SetSize(0, 15)
     f.Middle:SetSize(80, 15)
     f.Right:SetSize(0, 15)
