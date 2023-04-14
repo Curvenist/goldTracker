@@ -197,7 +197,6 @@ function DateM:CurrentWeekDays(timestamp, dayStart, nbDays, array)
 	if currentDay < dayStart then 
 		currentDay = nbDays + currentDay
 	end
-	print(currentDay, dayStart, nbDays)
 	for i = 1, (currentDay - dayStart) do
 	  array[i] = self:TTC(timestamp - (24 * 60 * 60)*i)
 	end
@@ -211,7 +210,6 @@ function DateM:WeekSegmentation(timestamp, dayStart, nbDays, array)
 	local forward = 1
 	if nbDays < 0 then nbDays = nbDays * -1 forward = -1 end
 	local currentDay = tonumber(date("%w", timestamp))
-	
 	if currentDay < dayStart then 
 		currentDay = nbDays + currentDay
 	end

@@ -5,6 +5,7 @@ GeneralM = {
 	commands = {
 		"%%",
 		"%%drawLine", -- draw a line
+		"%%br",
 		"%%rating", 
 		"%%label", -- is only a label
 		"%%outfn",
@@ -112,3 +113,5 @@ function GeneralM:replaceValues(text, value)
 	end
 	return text
 end
+
+--/run function t(a,b,c)  if a >= b then c = -c end return c end local r,m = GetCVar("RenderScale"),".1" if SecureCmdOptionParse"[mod:ctrl]" then m = t(r, "1", m) else m = t(r, "2", m) end; SetCVar("RenderScale", r + m); print(.. r + m );

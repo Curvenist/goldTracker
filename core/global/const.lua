@@ -44,7 +44,6 @@ Const = {
 			{"income", "Revenu", "Income"},
 			{"spending", "Dépense", "Spending"},
 			{"netEarning", "Performance", "Performance"},
-			{"%rating", "Perf / moyenne n-1", "Perf / avg n-1"},
 		},
         TrackerCurrent = {
             {"currentMoney", "Epargne", "Savings"},
@@ -72,9 +71,6 @@ Const = {
 		AdvancedStat = {
 			{"name", nil},
 			{"value", nil},
-		},
-		ElementDecoration = {
-			{"%drawLine"}
 		},
 		GTMMessage = {
 			"Perf Sup!", 

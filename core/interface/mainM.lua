@@ -57,7 +57,7 @@ function VProperties:update()
     self.interface = {w = MainM:getWidth(), h = MainM:getHeight() * 2} --in the interface panel
 	self.container = {w = MainM:getWidth(), h = MainM:getHeight()}
 	self.menuBox = {w = MainM:getWidth() / 4, h = MainM:getHeight()}
-	self.mainBox = {w = (MainM:getWidth() - MainM:getWidth() / 1.5), h = MainM:getHeight()}
+	self.mainBox = {w = (MainM:getWidth() - (MainM:getWidth() / 1.5)), h = MainM:getHeight()}
 	self.padding = {w = MainM:getWidth() * 0.05, h = MainM:getHeight() * -0.05} -- margins are 5% of the max size
 	self.reduced = {w = MainM:getWidth() / 4, h = MainM:getHeight() / 2}
 	self.textSize = {false, MainM.textSize(MainM.p.h)}
@@ -357,7 +357,7 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 		f:SetNumeric(true)
 		f:SetNumber(saved ~= nil and saved or item[4])
 		f:SetAutoFocus(false)
-		f:SetSize(15, 15)
+		f:SetSize(15, 10)
 		f:SetScript("OnEditFocusGained", function(s) 
 		end)
 		f:SetScript("OnEditFocusLost", function(s)
@@ -378,8 +378,6 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 		f:SetSize(position[2], position[3])
 	elseif elemtype == "dropdown" then
 		f = CreateFrame("Frame", name, parentFrame, "UIDropDownMenuTemplate")
-		f:SetSize(position[2], position[3])
-		UIDropDownMenu_SetWidth(f, position[2] / 2)
 		UIDropDownMenu_Initialize(f, function(frame, level)
 			info = UIDropDownMenu_CreateInfo()
 			for k, v in pairs(item[5][1]) do
@@ -393,8 +391,9 @@ function MainM:addPanelElementSingleItem(name, item, position, elemtype, parentF
 				UIDropDownMenu_AddButton(info)
 			end
 		end)
-		UIDropDownMenu_SetText(f, saved ~= nil and item[5][1][saved] or item[5][1][item[4]])
 		UIDropDownMenu_SetSelectedValue(f, saved ~= nil and saved or item[4])
+		
+		IntFns:ModifyDropDownTemplate(f)
 	end
 	f:SetPoint(position[1], X[1] + X[1], Y[1])
 	local l = f:CreateFontString(nil, "OVERLAY", "DSnormal")

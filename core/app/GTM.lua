@@ -117,7 +117,6 @@ end
 
 function GTM:popUpDataCompared()
 	local panelCentral, incomeType = MainM.panel.contentTrackerCurrent.fontStrings, self.options["incomeNature"]
-	local panelReduced = MainM.minPanel.main.fontStrings
 	if panelCentral ~= nil then
 		local myVal = Tracker:find(incomeType)
 		local result = {self.statDevi:rating(myVal, self:getstoreOperation(1)), 1}
@@ -127,20 +126,15 @@ function GTM:popUpDataCompared()
 
 		if comparaison == 1 then -- cap pos : green
 			panelCentral["%rating6"]:SetTextColor(0, 1, 0, 1)
-			panelReduced["%rating4"]:SetTextColor(0, 1, 0, 1)
 		elseif comparaison == 2 then -- cap neg : red
 			panelCentral["%rating6"]:SetTextColor(1, 0, 0, 1)
-			panelReduced["%rating4"]:SetTextColor(1, 0, 0, 1)
 		elseif comparaison == 3 then -- nocap pos
 			panelCentral["%rating6"]:SetTextColor(1 - gradient, 1, 0, 1)
-			panelReduced["%rating4"]:SetTextColor(1 - gradient, 1, 0, 1)
 		elseif comparaison == 4 then -- nocap neg
 			panelCentral["%rating6"]:SetTextColor(1, 1 - gradient, 0, 1)
-			panelReduced["%rating4"]:SetTextColor(1, 1 - gradient, 0, 1)
 		end
 		
 		panelCentral["%rating6"]:SetText(translate[1])
-		panelReduced["%rating4"]:SetText(translate[1])
 		if #self:getstoreTI() < 1 then
 			self:actualWeekScope(TrackerDate)
 			self:setstoreTI(myVal, 1)
